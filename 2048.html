@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2048 - 響應式音效版</title>
+    <title>2048 - 究極加強版</title>
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 300px; /* 手機版尺寸 */
-            --grid-gap: 15px;
+            --board-size-mobile: 320px;
+            --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
             --board-bg: #bbada0;
@@ -26,58 +26,83 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            /* 防止手機下拉重整干擾遊戲 */
             overscroll-behavior: none; 
             touch-action: none; 
         }
 
         h1 {
-            font-size: 60px;
-            margin: 0;
-            line-height: 1.2;
+            font-size: 50px;
+            margin: 5px 0;
+            line-height: 1;
         }
 
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* 控制列佈局 */
+        .controls-container {
             width: var(--board-size-desktop);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 10px;
         }
 
-        .score-container {
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-box {
             background-color: #bbada0;
-            padding: 10px 25px;
+            padding: 5px 15px;
             border-radius: 6px;
             color: white;
             font-weight: bold;
             display: flex;
             flex-direction: column;
+            min-width: 80px;
         }
+        .score-label { font-size: 12px; color: #eee4da; }
+        #score { font-size: 20px; }
 
-        .score-label {
-            font-size: 13px;
-            color: #eee4da;
-        }
-
-        #score {
-            font-size: 25px;
-        }
-
-        .new-game-btn {
+        /* 按鈕與選單樣式 */
+        .btn {
             background-color: #8f7a66;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             outline: none;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #7f6a56; }
+        .btn:active { transform: scale(0.96); }
+
+        .btn-undo {
+            background-color: #e78e46; /* 橘色區分 */
+        }
+        .btn-undo:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
-        .new-game-btn:active {
-            transform: scale(0.96);
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 2px solid #8f7a66;
+            background: #faf8ef;
+            color: #776e65;
+            font-weight: bold;
+            font-size: 16px;
         }
 
         /* 遊戲棋盤 */
@@ -90,8 +115,7 @@
             padding: var(--grid-gap);
             box-sizing: border-box;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
+            /* grid-template-columns/rows 由 JS 動態設定 */
             gap: var(--grid-gap);
         }
 
@@ -103,13 +127,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 55px;
             font-weight: bold;
             color: #776e65;
-            transition: transform 0.1s ease-in-out; 
-            /* 動畫效果 */
             animation: pop 0.2s ease-in;
+            user-select: none;
         }
+
+        /* 動態字體大小調整 (根據棋盤格數) */
+        /* 預設 4x4 */
+        .size-3 .tile { font-size: 60px; }
+        .size-4 .tile { font-size: 50px; }
+        .size-5 .tile { font-size: 40px; }
+        .size-6 .tile { font-size: 30px; }
+        .size-8 .tile { font-size: 22px; }
 
         @keyframes pop {
             0% { transform: scale(0); }
@@ -117,26 +147,31 @@
             100% { transform: scale(1); }
         }
 
-        /* 數字顏色與字體大小調整 */
+        /* 顏色配置 */
         .x2 { background-color: #eee4da; }
         .x4 { background-color: #ede0c8; }
         .x8 { background-color: #f2b179; color: #f9f6f2; }
         .x16 { background-color: #f59563; color: #f9f6f2; }
         .x32 { background-color: #f67c5f; color: #f9f6f2; }
         .x64 { background-color: #f65e3b; color: #f9f6f2; }
-        .x128 { background-color: #edcf72; color: #f9f6f2; font-size: 45px; box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.23815), inset 0 0 0 1px rgba(255, 255, 255, 0.14286); }
-        .x256 { background-color: #edcc61; color: #f9f6f2; font-size: 45px; box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.31746), inset 0 0 0 1px rgba(255, 255, 255, 0.19048); }
-        .x512 { background-color: #edc850; color: #f9f6f2; font-size: 45px; }
-        .x1024 { background-color: #edc53f; color: #f9f6f2; font-size: 35px; }
-        .x2048 { background-color: #edc22e; color: #f9f6f2; font-size: 35px; box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.55556), inset 0 0 0 1px rgba(255, 255, 255, 0.33333); }
+        .x128 { background-color: #edcf72; color: #f9f6f2; box-shadow: 0 0 30px 5px rgba(243, 215, 116, 0.4); } 
+        .x256 { background-color: #edcc61; color: #f9f6f2; box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.5); }
+        .x512 { background-color: #edc850; color: #f9f6f2; }
+        .x1024 { background-color: #edc53f; color: #f9f6f2; }
+        .x2048 { background-color: #edc22e; color: #f9f6f2; }
+
+        /* 針對高位數的字體微調 */
+        .size-4 .tile.x128, .size-4 .tile.x256, .size-4 .tile.x512 { font-size: 40px; }
+        .size-4 .tile.x1024, .size-4 .tile.x2048 { font-size: 30px; }
+        
+        /* 密集恐懼症模式(8x8)字體微調 */
+        .size-8 .tile.x128, .size-8 .tile.x256, .size-8 .tile.x512 { font-size: 18px; }
+        .size-8 .tile.x1024, .size-8 .tile.x2048 { font-size: 14px; }
 
         #game-over {
             display: none;
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(238, 228, 218, 0.73);
             z-index: 100;
             flex-direction: column;
@@ -144,127 +179,136 @@
             align-items: center;
             font-size: 30px;
             font-weight: bold;
-            color: #776e65;
             border-radius: 6px;
         }
 
-        .instructions {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #776e65;
-        }
+        .instructions { font-size: 14px; margin-top: 15px; color: #776e65;}
+        .sound-toggle { margin-top: 10px; cursor: pointer; font-size: 13px; text-decoration: underline; color: #8f7a66;}
 
-        /* --- 手機版 RWD 設定 --- */
+        /* --- 手機版 RWD --- */
         @media screen and (max-width: 520px) {
-            .header-container {
-                width: var(--board-size-mobile);
-            }
-
+            .controls-container { width: var(--board-size-mobile); }
             #board {
                 width: var(--board-size-mobile);
                 height: var(--board-size-mobile);
-                padding: 10px;
-                gap: 10px;
+                padding: 5px;
+                gap: 5px;
             }
+            :root { --grid-gap: 5px; }
 
-            .tile {
-                font-size: 30px; /* 手機上字體改小 */
-            }
-
-            .x128, .x256, .x512 { font-size: 25px; }
-            .x1024, .x2048 { font-size: 20px; }
-
-            h1 { font-size: 40px; }
-        }
-        
-        .sound-toggle {
-            margin-top: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: underline;
+            /* 手機版字體再縮小一點 */
+            .size-4 .tile { font-size: 35px; }
+            .size-6 .tile { font-size: 20px; }
+            .size-8 .tile { font-size: 14px; }
+            
+            h1 { font-size: 36px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>2048</h1>
-        <div class="score-container">
-            <span class="score-label">SCORE</span>
-            <span id="score">0</span>
+    <div class="controls-container">
+        <div class="top-row">
+            <h1>2048</h1>
+            <div class="score-box">
+                <span class="score-label">SCORE</span>
+                <span id="score">0</span>
+            </div>
         </div>
-        <button class="new-game-btn" onclick="initGame()">新遊戲</button>
+        
+        <div class="bottom-row">
+            <!-- 尺寸選擇 -->
+            <select id="grid-size">
+                <option value="3">3 x 3 (簡單)</option>
+                <option value="4" selected>4 x 4 (經典)</option>
+                <option value="5">5 x 5 (中等)</option>
+                <option value="6">6 x 6 (困難)</option>
+                <option value="8">8 x 8 (專家)</option>
+            </select>
+            
+            <!-- 新遊戲 -->
+            <button class="btn" onclick="initGame()">新遊戲</button>
+            
+            <!-- 撤銷按鈕 -->
+            <button class="btn btn-undo" id="undo-btn" onclick="undo()" disabled>↩ 撤銷</button>
+        </div>
     </div>
 
     <div id="board">
         <div id="game-over">
             <p>遊戲結束!</p>
-            <button class="new-game-btn" onclick="initGame()">再試一次</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-undo" onclick="undo()">↩ 悔棋</button>
+                <button class="btn" onclick="initGame()">重玩</button>
+            </div>
         </div>
         <!-- 格子由 JS 生成 -->
     </div>
 
-    <p class="instructions" id="instructions-text">使用 <strong>方向鍵</strong> 或 <strong>滑動</strong> 來移動</p>
+    <p class="instructions">方向鍵 / 滑動移動方塊，相同數字會合併</p>
     <div class="sound-toggle" onclick="toggleSound()">🔊 音效: 開啟</div>
 
     <script>
-        // --- 1. 遊戲參數與變數 ---
-        const rows = 4;
-        const columns = 4;
+        // --- 變數與設定 ---
         let board;
         let score = 0;
+        let rows = 4;
+        let columns = 4;
         let isGameOver = false;
         let soundEnabled = true;
+        
+        // 歷史紀錄堆疊 (用於撤銷)
+        let gameHistory = []; 
 
-        // --- 2. 音效系統 (Web Audio API) ---
-        // 這讓我們不需要外部 mp3 檔案就能產生可愛的聲音
+        // --- 音效系統 (Web Audio API) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
         function playSound(type) {
             if (!soundEnabled || audioCtx.state === 'suspended') {
-                // 瀏覽器政策要求使用者互動後才能播放聲音
                 audioCtx.resume();
                 if (!soundEnabled) return;
             }
 
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-
             const now = audioCtx.currentTime;
 
             if (type === 'move') {
-                // 短促的波波聲
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(600, now);
-                osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
                 osc.start(now);
                 osc.stop(now + 0.1);
-
             } else if (type === 'merge') {
-                // 可愛的叮叮聲
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(800, now + 0.1);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
-
-            } else if (type === 'gameover') {
-                // 失敗的聲音
-                osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(300, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 0.5);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
                 osc.start(now);
-                osc.stop(now + 0.5);
+                osc.stop(now + 0.15);
+            } else if (type === 'gameover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.8);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            } else if (type === 'undo') {
+                // 倒帶的聲音 (頻率上升的咻聲)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
             }
         }
 
@@ -273,64 +317,106 @@
             document.querySelector('.sound-toggle').innerText = soundEnabled ? "🔊 音效: 開啟" : "🔇 音效: 關閉";
         }
 
-        // --- 3. 遊戲初始化 ---
+        // --- 遊戲邏輯 ---
+
         window.onload = function() {
             initGame();
         }
 
         function initGame() {
-            board = [
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ];
+            // 讀取選擇的尺寸
+            const sizeSelect = document.getElementById("grid-size");
+            const size = parseInt(sizeSelect.value);
+            rows = size;
+            columns = size;
+
+            // 重置變數
+            board = Array.from({ length: rows }, () => Array(columns).fill(0));
             score = 0;
             isGameOver = false;
+            gameHistory = []; // 清空歷史
+            updateUndoButton();
+
+            // 更新 UI
             document.getElementById("score").innerText = score;
             document.getElementById("game-over").style.display = "none";
             
-            // 清空舊格子
+            // 設定 CSS Grid 佈局
             const boardEl = document.getElementById("board");
+            boardEl.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+            
+            // 設定 Class 以調整字體大小 (例如 .size-8)
+            boardEl.className = `size-${size}`;
+
+            renderBoard();
+            setTwo();
+            setTwo();
+        }
+
+        // 儲存狀態 (Deep Copy)
+        function saveState() {
+            // 將當前的 board 和 score 存入歷史
+            const state = {
+                board: JSON.parse(JSON.stringify(board)),
+                score: score
+            };
+            gameHistory.push(state);
+            updateUndoButton();
+        }
+
+        // 撤銷功能
+        function undo() {
+            if (gameHistory.length === 0) return;
+
+            const lastState = gameHistory.pop();
+            board = lastState.board;
+            score = lastState.score;
+            isGameOver = false; // 撤銷後當然不算輸
+            
+            document.getElementById("score").innerText = score;
+            document.getElementById("game-over").style.display = "none";
+            
+            renderBoard();
+            updateUndoButton();
+            playSound('undo');
+        }
+
+        function updateUndoButton() {
+            const btn = document.getElementById("undo-btn");
+            btn.disabled = gameHistory.length === 0;
+        }
+
+        function renderBoard() {
+            const boardEl = document.getElementById("board");
+            // 保留 game-over 遮罩，清除其他方塊
             const tiles = document.querySelectorAll(".tile");
             tiles.forEach(t => t.remove());
 
-            // 創建網格
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
                     let tile = document.createElement("div");
-                    tile.id = `${r}-${c}`;
                     tile.classList.add("tile");
                     let num = board[r][c];
-                    updateTile(tile, num);
+                    
+                    if (num > 0) {
+                        tile.innerText = num;
+                        if (num <= 2048) {
+                            tile.classList.add("x" + num);
+                        } else {
+                            tile.classList.add("x2048");
+                        }
+                    }
                     boardEl.appendChild(tile);
                 }
             }
-
-            setTwo();
-            setTwo();
         }
 
-        function updateTile(tile, num) {
-            tile.innerText = "";
-            tile.className = "tile"; // 重置 class
-            if (num > 0) {
-                tile.innerText = num;
-                if (num <= 2048) {
-                    tile.classList.add("x" + num);
-                } else {
-                    tile.classList.add("x2048");
-                }
-            }
-        }
-
-        // --- 4. 移動邏輯 (核心) ---
         function filterZero(row) {
             return row.filter(num => num != 0);
         }
 
         function slide(row) {
-            // [0, 2, 2, 2] -> [2, 2, 2]
             row = filterZero(row);
             let mergedThisRow = false;
 
@@ -352,8 +438,23 @@
 
         function move(direction) {
             if (isGameOver) return;
+
+            // 在移動前，先嘗試計算移動後的結果
+            // 如果結果跟現在不一樣，才真的執行並存檔
+            
+            // 為了不重複寫邏輯，我們先做一個 Deep Copy 來模擬
+            let tempBoard = JSON.parse(JSON.stringify(board));
+            let tempScore = score;
             let moved = false;
             let mergedInMove = false;
+
+            // 執行移動邏輯於 tempBoard
+            // 這裡邏輯稍微複雜，為了復用代碼，我直接操作真實 board
+            // 但在操作前先存檔 (Save State)，如果最後發現沒移動，再把歷史紀錄 pop 出來即可 (或者只在 moved 為真時 push)
+            
+            // 更好的做法：先不存，確定 moved 為真，再存 "移動前" 的狀態
+            const currentBoardState = JSON.parse(JSON.stringify(board));
+            const currentScoreState = score;
 
             if (direction === 'Left' || direction === 'Right') {
                 for (let r = 0; r < rows; r++) {
@@ -368,17 +469,13 @@
 
                     board[r] = row;
                     if (JSON.stringify(board[r]) !== original) moved = true;
-
-                    // Update DOM
-                    for (let c = 0; c < columns; c++) {
-                        let tile = document.getElementById(`${r}-${c}`);
-                        updateTile(tile, board[r][c]);
-                    }
                 }
             } 
             else if (direction === 'Up' || direction === 'Down') {
                 for (let c = 0; c < columns; c++) {
-                    let row = [board[0][c], board[1][c], board[2][c], board[3][c]];
+                    let row = [];
+                    for(let r=0; r<rows; r++) row.push(board[r][c]);
+                    
                     let original = JSON.stringify(row);
 
                     if (direction === 'Down') row.reverse();
@@ -387,21 +484,25 @@
                     if (result.merged) mergedInMove = true;
                     if (direction === 'Down') row.reverse();
 
-                    // Update Board & DOM
                     for (let r = 0; r < rows; r++) {
                         board[r][c] = row[r];
-                        let tile = document.getElementById(`${r}-${c}`);
-                        updateTile(tile, board[r][c]);
                     }
                     if (JSON.stringify(row) !== original) moved = true;
                 }
             }
 
             if (moved) {
+                // 有移動發生，所以要把"移動前"的狀態存入歷史
+                gameHistory.push({
+                    board: currentBoardState,
+                    score: currentScoreState
+                });
+                updateUndoButton();
+
                 document.getElementById("score").innerText = score;
+                renderBoard(); // 重繪整個版面確保同步
                 setTwo();
                 
-                // 播放音效
                 if (mergedInMove) playSound('merge');
                 else playSound('move');
 
@@ -409,7 +510,6 @@
             }
         }
 
-        // --- 5. 生成數字 ---
         function setTwo() {
             if (!hasEmptyTile()) return;
             let found = false;
@@ -418,8 +518,13 @@
                 let c = Math.floor(Math.random() * columns);
                 if (board[r][c] == 0) {
                     board[r][c] = Math.random() > 0.1 ? 2 : 4;
-                    let tile = document.getElementById(`${r}-${c}`);
-                    updateTile(tile, board[r][c]);
+                    // 單獨更新 DOM 增加動畫
+                    // 這裡為了簡化直接重繪，或也可只更新該格
+                    // 為了效率，可以只更新該格:
+                    let allTiles = document.querySelectorAll('.tile');
+                    // 因為 DOM 順序與陣列一致 (除去game-over div)
+                    // 但我們有重新生成機制，這裡簡單重繪最穩
+                    renderBoard();
                     found = true;
                 }
             }
@@ -436,7 +541,7 @@
 
         function checkGameOver() {
             if (hasEmptyTile()) return;
-            // 檢查是否可合併
+            
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
                     if (c < columns - 1 && board[r][c] == board[r][c+1]) return;
@@ -449,9 +554,7 @@
             playSound('gameover');
         }
 
-        // --- 6. 輸入控制 (鍵盤 & 觸控) ---
-        
-        // 鍵盤
+        // --- 輸入監聽 ---
         document.addEventListener('keyup', (e) => {
             if (e.code == "ArrowLeft") move('Left');
             else if (e.code == "ArrowRight") move('Right');
@@ -459,49 +562,38 @@
             else if (e.code == "ArrowDown") move('Down');
         });
 
-        // 觸控 (手機版)
         let startX, startY;
         const boardDom = document.getElementById('board');
 
         document.addEventListener('touchstart', (e) => {
-            if(e.touches.length > 1) return; // 忽略多點觸控
+            if(e.touches.length > 1) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
-            // 嘗試解鎖音效 Context (因為瀏覽器需要互動才能播音)
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }, { passive: false });
 
         document.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // 防止滑動時捲動畫面
+            e.preventDefault();
         }, { passive: false });
 
         document.addEventListener('touchend', (e) => {
             if(!startX || !startY) return;
-
             let endX = e.changedTouches[0].clientX;
             let endY = e.changedTouches[0].clientY;
-
             let diffX = endX - startX;
             let diffY = endY - startY;
 
-            // 判斷是水平還是垂直滑動
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                // 水平
-                if (Math.abs(diffX) > 30) { // 門檻值，防止誤觸
-                    if (diffX > 0) move('Right');
-                    else move('Left');
+                if (Math.abs(diffX) > 30) {
+                    if (diffX > 0) move('Right'); else move('Left');
                 }
             } else {
-                // 垂直
                 if (Math.abs(diffY) > 30) {
-                    if (diffY > 0) move('Down');
-                    else move('Up');
+                    if (diffY > 0) move('Down'); else move('Up');
                 }
             }
-            startX = null;
-            startY = null;
+            startX = null; startY = null;
         });
-
     </script>
 </body>
 </html>
