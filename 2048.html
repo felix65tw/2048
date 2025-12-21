@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2048 - 究極加強版</title>
+    <title>2048 - 終極設定版</title>
     <style>
         :root {
             --board-size-desktop: 500px;
@@ -12,6 +12,8 @@
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
             --board-bg: #bbada0;
+            --button-color: #8f7a66;
+            --button-hover: #7f6a56;
         }
 
         body {
@@ -28,34 +30,36 @@
             height: 100vh;
             overscroll-behavior: none; 
             touch-action: none; 
+            overflow: hidden;
         }
 
-        h1 {
-            font-size: 50px;
-            margin: 5px 0;
-            line-height: 1;
-        }
-
-        /* 控制列佈局 */
+        /* --- 頂部控制列 --- */
         .controls-container {
             width: var(--board-size-desktop);
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-bottom: 10px;
+            position: relative;
+            z-index: 10;
         }
 
-        .top-row {
+        .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .bottom-row {
+        h1 {
+            font-size: 50px;
+            margin: 0;
+            line-height: 1;
+            color: #776e65;
+        }
+
+        .scores-wrapper {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
+            gap: 5px;
         }
 
         .score-box {
@@ -66,46 +70,51 @@
             font-weight: bold;
             display: flex;
             flex-direction: column;
-            min-width: 80px;
+            min-width: 60px;
+            user-select: none; 
+            cursor: pointer;
+            transition: transform 0.1s;
         }
-        .score-label { font-size: 12px; color: #eee4da; }
-        #score { font-size: 20px; }
+        .score-box:active { transform: scale(0.95); }
+        .score-label { font-size: 11px; color: #eee4da; text-transform: uppercase;}
+        .score-val { font-size: 18px; }
 
-        /* 按鈕與選單樣式 */
+        .buttons-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- 按鈕樣式 --- */
         .btn {
-            background-color: #8f7a66;
+            background-color: var(--button-color);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 10px 15px;
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
             outline: none;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
-        .btn:hover { background-color: #7f6a56; }
+        .btn:hover { background-color: var(--button-hover); }
         .btn:active { transform: scale(0.96); }
 
-        .btn-undo {
-            background-color: #e78e46; /* 橘色區分 */
-        }
-        .btn-undo:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        .btn-undo { background-color: #e78e46; }
+        .btn-undo:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .btn-settings {
+            background-color: #776e65;
+            padding: 8px 12px;
+            font-size: 18px;
         }
 
-        select {
-            padding: 8px;
-            border-radius: 5px;
-            border: 2px solid #8f7a66;
-            background: #faf8ef;
-            color: #776e65;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        /* 遊戲棋盤 */
+        /* --- 遊戲棋盤 --- */
         #board {
             width: var(--board-size-desktop);
             height: var(--board-size-desktop);
@@ -115,13 +124,11 @@
             padding: var(--grid-gap);
             box-sizing: border-box;
             display: grid;
-            /* grid-template-columns/rows 由 JS 動態設定 */
             gap: var(--grid-gap);
         }
 
         .tile {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-color: var(--tile-base-color);
             border-radius: 3px;
             display: flex;
@@ -133,8 +140,7 @@
             user-select: none;
         }
 
-        /* 動態字體大小調整 (根據棋盤格數) */
-        /* 預設 4x4 */
+        /* 字體大小 RWD */
         .size-3 .tile { font-size: 60px; }
         .size-4 .tile { font-size: 50px; }
         .size-5 .tile { font-size: 40px; }
@@ -147,7 +153,7 @@
             100% { transform: scale(1); }
         }
 
-        /* 顏色配置 */
+        /* 數字顏色 */
         .x2 { background-color: #eee4da; }
         .x4 { background-color: #ede0c8; }
         .x8 { background-color: #f2b179; color: #f9f6f2; }
@@ -158,32 +164,134 @@
         .x256 { background-color: #edcc61; color: #f9f6f2; box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.5); }
         .x512 { background-color: #edc850; color: #f9f6f2; }
         .x1024 { background-color: #edc53f; color: #f9f6f2; }
-        .x2048 { background-color: #edc22e; color: #f9f6f2; }
+        .x2048 { background-color: #edc22e; color: #f9f6f2; box-shadow: 0 0 30px 10px rgba(237, 194, 46, 0.6); }
 
-        /* 針對高位數的字體微調 */
+        /* 高位數微調 */
         .size-4 .tile.x128, .size-4 .tile.x256, .size-4 .tile.x512 { font-size: 40px; }
         .size-4 .tile.x1024, .size-4 .tile.x2048 { font-size: 30px; }
-        
-        /* 密集恐懼症模式(8x8)字體微調 */
         .size-8 .tile.x128, .size-8 .tile.x256, .size-8 .tile.x512 { font-size: 18px; }
         .size-8 .tile.x1024, .size-8 .tile.x2048 { font-size: 14px; }
 
-        #game-over {
+        /* --- Overlay 通用樣式 (設定、勝利、失敗) --- */
+        .overlay {
             display: none;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(238, 228, 218, 0.73);
             z-index: 100;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 30px;
-            font-weight: bold;
             border-radius: 6px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- 設定畫面 --- */
+        #settings-screen {
+            background-color: rgba(250, 248, 239, 0.95);
+            color: #776e65;
+            z-index: 150;
+        }
+        
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 2px solid #8f7a66;
+            background: #fff;
+            color: #776e65;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* --- 遊戲結束畫面 (失敗) --- */
+        #game-over {
+            background-color: rgba(238, 228, 218, 0.73);
+            color: #776e65;
+        }
+
+        /* --- 勝利畫面 (全螢幕特效) --- */
+        #victory-screen {
+            position: fixed; 
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(10, 10, 20, 0.92);
+            z-index: 2000;
+        }
+
+        #fireworks-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2001;
+            pointer-events: none;
+        }
+
+        .victory-content {
+            position: relative;
+            z-index: 2003;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .neon-text {
+            font-size: 70px;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #ff00de, 0 0 80px #ff00de;
+            animation: pulsate 1.5s infinite alternate;
+        }
+
+        @keyframes pulsate {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.9; transform: scale(1.05); }
+        }
+
+        /* 勝利統計數據 */
+        .victory-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            text-align: center;
+        }
+
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-label { font-size: 12px; color: #ccc; margin-bottom: 5px; }
+        .stat-val { font-size: 24px; font-weight: bold; color: #ffeb3b; }
+
+        .btn-victory-new {
+            background-color: #f65e3b;
+            font-size: 22px;
+            padding: 15px 40px;
+            box-shadow: 0 0 20px rgba(246, 94, 59, 0.6);
+            border: 2px solid #fff;
+            margin-top: 10px;
         }
 
         .instructions { font-size: 14px; margin-top: 15px; color: #776e65;}
-        .sound-toggle { margin-top: 10px; cursor: pointer; font-size: 13px; text-decoration: underline; color: #8f7a66;}
 
         /* --- 手機版 RWD --- */
         @media screen and (max-width: 520px) {
@@ -191,73 +299,124 @@
             #board {
                 width: var(--board-size-mobile);
                 height: var(--board-size-mobile);
-                padding: 5px;
-                gap: 5px;
+                padding: 5px; gap: 5px;
             }
             :root { --grid-gap: 5px; }
-
-            /* 手機版字體再縮小一點 */
+            h1 { font-size: 36px; }
+            .neon-text { font-size: 50px; }
             .size-4 .tile { font-size: 35px; }
             .size-6 .tile { font-size: 20px; }
             .size-8 .tile { font-size: 14px; }
             
-            h1 { font-size: 36px; }
+            .victory-stats { gap: 10px; padding: 10px; }
+            .stat-val { font-size: 20px; }
         }
     </style>
 </head>
 <body>
 
     <div class="controls-container">
-        <div class="top-row">
+        <!-- 頂部：標題、分數、設定 -->
+        <div class="header-row">
             <h1>2048</h1>
-            <div class="score-box">
-                <span class="score-label">SCORE</span>
-                <span id="score">0</span>
+            <div class="scores-wrapper">
+                <div class="score-box" id="step-box-trigger">
+                    <span class="score-label">Steps</span>
+                    <span class="score-val" id="steps">0</span>
+                </div>
+                <!-- 測試獲勝: 點3次 -->
+                <div class="score-box" id="score-box-trigger">
+                    <span class="score-label">Score</span>
+                    <span class="score-val" id="score">0</span>
+                </div>
+                <button class="btn btn-settings" onclick="openSettings()">⚙️</button>
             </div>
         </div>
         
-        <div class="bottom-row">
-            <!-- 尺寸選擇 -->
-            <select id="grid-size">
-                <option value="3">3 x 3 (簡單)</option>
-                <option value="4" selected>4 x 4 (經典)</option>
-                <option value="5">5 x 5 (中等)</option>
-                <option value="6">6 x 6 (困難)</option>
-                <option value="8">8 x 8 (專家)</option>
-            </select>
-            
-            <!-- 新遊戲 -->
+        <!-- 底部：新遊戲、撤銷 -->
+        <div class="buttons-row">
             <button class="btn" onclick="initGame()">新遊戲</button>
-            
-            <!-- 撤銷按鈕 -->
             <button class="btn btn-undo" id="undo-btn" onclick="undo()" disabled>↩ 撤銷</button>
         </div>
     </div>
 
+    <!-- 遊戲棋盤區域 -->
     <div id="board">
-        <div id="game-over">
-            <p>遊戲結束!</p>
+        
+        <!-- 設定選單 Overlay -->
+        <div id="settings-screen" class="overlay">
+            <h2 style="font-size:30px; margin-bottom:20px;">設 定</h2>
+            <div class="settings-content">
+                <div class="settings-item">
+                    <span>棋盤大小</span>
+                    <select id="grid-size" onchange="initGame()">
+                        <option value="3">3 x 3</option>
+                        <option value="4" selected>4 x 4</option>
+                        <option value="5">5 x 5</option>
+                        <option value="6">6 x 6</option>
+                        <option value="8">8 x 8</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <span>音效</span>
+                    <button class="btn" id="sound-btn" onclick="toggleSound()" style="padding:5px 15px; font-size:14px;">開啟</button>
+                </div>
+                <hr style="width:100%; border:0; border-top:1px solid #ccc;">
+                <button class="btn" onclick="closeSettings()" style="width:100%;">返回遊戲</button>
+            </div>
+        </div>
+
+        <!-- 失敗畫面 Overlay -->
+        <div id="game-over" class="overlay">
+            <p style="font-size:30px; font-weight:bold;">遊戲結束!</p>
             <div style="display:flex; gap:10px;">
                 <button class="btn btn-undo" onclick="undo()">↩ 悔棋</button>
                 <button class="btn" onclick="initGame()">重玩</button>
             </div>
         </div>
-        <!-- 格子由 JS 生成 -->
+        
+        <!-- 格子會動態生成在這裡 -->
+    </div>
+
+    <!-- 勝利畫面 Overlay (全螢幕) -->
+    <div id="victory-screen" class="overlay">
+        <canvas id="fireworks-canvas"></canvas>
+        <div class="victory-content">
+            <div class="neon-text">YOU WIN!</div>
+            
+            <!-- 勝利統計資訊 -->
+            <div class="victory-stats">
+                <div class="stat-item">
+                    <span class="stat-label">分數</span>
+                    <span class="stat-val" id="vic-score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">步數</span>
+                    <span class="stat-val" id="vic-steps">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">撤銷</span>
+                    <span class="stat-val" id="vic-undos">0</span>
+                </div>
+            </div>
+
+            <!-- 僅保留新遊戲 -->
+            <button class="btn btn-victory-new" onclick="initGame()">新遊戲</button>
+        </div>
     </div>
 
     <p class="instructions">方向鍵 / 滑動移動方塊，相同數字會合併</p>
-    <div class="sound-toggle" onclick="toggleSound()">🔊 音效: 開啟</div>
 
     <script>
-        // --- 變數與設定 ---
+        // --- 全局變數 ---
         let board;
         let score = 0;
+        let steps = 0;
+        let undoCount = 0; // 紀錄撤銷次數
         let rows = 4;
         let columns = 4;
         let isGameOver = false;
         let soundEnabled = true;
-        
-        // 歷史紀錄堆疊 (用於撤銷)
         let gameHistory = []; 
 
         // --- 音效系統 (Web Audio API) ---
@@ -277,76 +436,136 @@
             const now = audioCtx.currentTime;
 
             if (type === 'move') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
                 gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'merge') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, now);
                 osc.frequency.linearRampToValueAtTime(600, now + 0.1);
                 gainNode.gain.setValueAtTime(0.2, now);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now);
-                osc.stop(now + 0.15);
-            } else if (type === 'gameover') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.8);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.8);
-                osc.start(now);
-                osc.stop(now + 0.8);
+                osc.start(now); osc.stop(now + 0.15);
             } else if (type === 'undo') {
-                // 倒帶的聲音 (頻率上升的咻聲)
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(200, now);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(200, now);
                 osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
                 gainNode.gain.setValueAtTime(0.1, now);
                 gainNode.gain.linearRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'gameover') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.8);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.8);
+                osc.start(now); osc.stop(now + 0.8);
+            } else if (type === 'win') {
+                // 勝利音效
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98]; 
+                notes.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'triangle'; o.connect(g); g.connect(audioCtx.destination);
+                        o.frequency.value = freq;
+                        g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                        o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.6);
+                    }, i * 100);
+                });
+            } else if (type === 'firework') {
+                const bufferSize = audioCtx.sampleRate * 0.5; 
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const noiseGain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass'; filter.frequency.value = 800;
+                noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(audioCtx.destination);
+                noiseGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                noise.start(audioCtx.currentTime);
             }
         }
 
         function toggleSound() {
             soundEnabled = !soundEnabled;
-            document.querySelector('.sound-toggle').innerText = soundEnabled ? "🔊 音效: 開啟" : "🔇 音效: 關閉";
+            const btn = document.getElementById('sound-btn');
+            btn.innerText = soundEnabled ? "開啟" : "關閉";
+            btn.style.backgroundColor = soundEnabled ? "#8f7a66" : "#999";
         }
 
-        // --- 遊戲邏輯 ---
+        // --- 設定選單邏輯 ---
+        function openSettings() {
+            // 如果遊戲結束或勝利畫面正在顯示，暫時不給開設定，避免層級混亂
+            if(document.getElementById("victory-screen").style.display === "flex") return;
+            document.getElementById("settings-screen").style.display = "flex";
+        }
 
+        function closeSettings() {
+            document.getElementById("settings-screen").style.display = "none";
+        }
+
+        // --- 測試密技 ---
+        // 1. 點 Score 3次 -> 贏
+        let winClickCount = 0;
+        let winClickTimer = null;
+        document.getElementById("score-box-trigger").addEventListener("click", function() {
+            winClickCount++;
+            if (winClickCount === 3) {
+                triggerVictory();
+                winClickCount = 0;
+            }
+            clearTimeout(winClickTimer);
+            winClickTimer = setTimeout(() => { winClickCount = 0; }, 500); 
+        });
+
+        // 2. 點 Steps 3次 -> 輸 (新增需求)
+        let loseClickCount = 0;
+        let loseClickTimer = null;
+        document.getElementById("step-box-trigger").addEventListener("click", function() {
+            loseClickCount++;
+            if (loseClickCount === 3) {
+                triggerDefeat();
+                loseClickCount = 0;
+            }
+            clearTimeout(loseClickTimer);
+            loseClickTimer = setTimeout(() => { loseClickCount = 0; }, 500); 
+        });
+
+        // --- 遊戲邏輯 ---
         window.onload = function() {
             initGame();
+            window.addEventListener('resize', resizeCanvas);
         }
 
         function initGame() {
-            // 讀取選擇的尺寸
+            closeSettings(); // 確保設定關閉
+            
             const sizeSelect = document.getElementById("grid-size");
             const size = parseInt(sizeSelect.value);
             rows = size;
             columns = size;
 
-            // 重置變數
             board = Array.from({ length: rows }, () => Array(columns).fill(0));
             score = 0;
+            steps = 0;
+            undoCount = 0;
             isGameOver = false;
-            gameHistory = []; // 清空歷史
+            gameHistory = []; 
             updateUndoButton();
 
-            // 更新 UI
             document.getElementById("score").innerText = score;
+            document.getElementById("steps").innerText = steps;
             document.getElementById("game-over").style.display = "none";
-            
-            // 設定 CSS Grid 佈局
+            document.getElementById("victory-screen").style.display = "none";
+            stopFireworks();
+
             const boardEl = document.getElementById("board");
             boardEl.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
             boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            
-            // 設定 Class 以調整字體大小 (例如 .size-8)
             boardEl.className = `size-${size}`;
 
             renderBoard();
@@ -354,28 +573,22 @@
             setTwo();
         }
 
-        // 儲存狀態 (Deep Copy)
-        function saveState() {
-            // 將當前的 board 和 score 存入歷史
-            const state = {
-                board: JSON.parse(JSON.stringify(board)),
-                score: score
-            };
-            gameHistory.push(state);
-            updateUndoButton();
-        }
-
-        // 撤銷功能
         function undo() {
             if (gameHistory.length === 0) return;
-
             const lastState = gameHistory.pop();
             board = lastState.board;
             score = lastState.score;
-            isGameOver = false; // 撤銷後當然不算輸
+            steps = lastState.steps;
+            
+            // 撤銷時增加計數 (注意: 這裡的邏輯是只要用了撤銷就算一次，不管退幾步)
+            undoCount++; 
+            isGameOver = false;
+            
+            // 隱藏失敗畫面
+            document.getElementById("game-over").style.display = "none";
             
             document.getElementById("score").innerText = score;
-            document.getElementById("game-over").style.display = "none";
+            document.getElementById("steps").innerText = steps;
             
             renderBoard();
             updateUndoButton();
@@ -383,13 +596,11 @@
         }
 
         function updateUndoButton() {
-            const btn = document.getElementById("undo-btn");
-            btn.disabled = gameHistory.length === 0;
+            document.getElementById("undo-btn").disabled = gameHistory.length === 0;
         }
 
         function renderBoard() {
             const boardEl = document.getElementById("board");
-            // 保留 game-over 遮罩，清除其他方塊
             const tiles = document.querySelectorAll(".tile");
             tiles.forEach(t => t.remove());
 
@@ -398,14 +609,10 @@
                     let tile = document.createElement("div");
                     tile.classList.add("tile");
                     let num = board[r][c];
-                    
                     if (num > 0) {
                         tile.innerText = num;
-                        if (num <= 2048) {
-                            tile.classList.add("x" + num);
-                        } else {
-                            tile.classList.add("x2048");
-                        }
+                        if (num <= 2048) tile.classList.add("x" + num);
+                        else tile.classList.add("x2048");
                     }
                     boardEl.appendChild(tile);
                 }
@@ -419,7 +626,6 @@
         function slide(row) {
             row = filterZero(row);
             let mergedThisRow = false;
-
             for (let i = 0; i < row.length - 1; i++) {
                 if (row[i] == row[i+1]) {
                     row[i] *= 2;
@@ -428,45 +634,30 @@
                     mergedThisRow = true;
                 }
             }
-            
             row = filterZero(row);
-            while (row.length < columns) {
-                row.push(0);
-            }
+            while (row.length < columns) row.push(0);
             return { newRow: row, merged: mergedThisRow };
         }
 
         function move(direction) {
-            if (isGameOver) return;
+            if (isGameOver || document.getElementById("settings-screen").style.display === "flex") return;
 
-            // 在移動前，先嘗試計算移動後的結果
-            // 如果結果跟現在不一樣，才真的執行並存檔
-            
-            // 為了不重複寫邏輯，我們先做一個 Deep Copy 來模擬
-            let tempBoard = JSON.parse(JSON.stringify(board));
-            let tempScore = score;
-            let moved = false;
-            let mergedInMove = false;
-
-            // 執行移動邏輯於 tempBoard
-            // 這裡邏輯稍微複雜，為了復用代碼，我直接操作真實 board
-            // 但在操作前先存檔 (Save State)，如果最後發現沒移動，再把歷史紀錄 pop 出來即可 (或者只在 moved 為真時 push)
-            
-            // 更好的做法：先不存，確定 moved 為真，再存 "移動前" 的狀態
             const currentBoardState = JSON.parse(JSON.stringify(board));
             const currentScoreState = score;
+            const currentStepsState = steps;
+
+            let moved = false;
+            let mergedInMove = false;
 
             if (direction === 'Left' || direction === 'Right') {
                 for (let r = 0; r < rows; r++) {
                     let row = board[r];
                     let original = JSON.stringify(row);
-                    
                     if (direction === 'Right') row.reverse();
                     let result = slide(row);
                     row = result.newRow;
                     if (result.merged) mergedInMove = true;
                     if (direction === 'Right') row.reverse();
-
                     board[r] = row;
                     if (JSON.stringify(board[r]) !== original) moved = true;
                 }
@@ -475,37 +666,34 @@
                 for (let c = 0; c < columns; c++) {
                     let row = [];
                     for(let r=0; r<rows; r++) row.push(board[r][c]);
-                    
                     let original = JSON.stringify(row);
-
                     if (direction === 'Down') row.reverse();
                     let result = slide(row);
                     row = result.newRow;
                     if (result.merged) mergedInMove = true;
                     if (direction === 'Down') row.reverse();
-
-                    for (let r = 0; r < rows; r++) {
-                        board[r][c] = row[r];
-                    }
+                    for (let r = 0; r < rows; r++) board[r][c] = row[r];
                     if (JSON.stringify(row) !== original) moved = true;
                 }
             }
 
             if (moved) {
-                // 有移動發生，所以要把"移動前"的狀態存入歷史
+                steps++;
                 gameHistory.push({
                     board: currentBoardState,
-                    score: currentScoreState
+                    score: currentScoreState,
+                    steps: currentStepsState
                 });
                 updateUndoButton();
-
                 document.getElementById("score").innerText = score;
-                renderBoard(); // 重繪整個版面確保同步
+                document.getElementById("steps").innerText = steps;
+                renderBoard();
                 setTwo();
                 
                 if (mergedInMove) playSound('merge');
                 else playSound('move');
 
+                checkWin();
                 checkGameOver();
             }
         }
@@ -518,12 +706,6 @@
                 let c = Math.floor(Math.random() * columns);
                 if (board[r][c] == 0) {
                     board[r][c] = Math.random() > 0.1 ? 2 : 4;
-                    // 單獨更新 DOM 增加動畫
-                    // 這裡為了簡化直接重繪，或也可只更新該格
-                    // 為了效率，可以只更新該格:
-                    let allTiles = document.querySelectorAll('.tile');
-                    // 因為 DOM 順序與陣列一致 (除去game-over div)
-                    // 但我們有重新生成機制，這裡簡單重繪最穩
                     renderBoard();
                     found = true;
                 }
@@ -531,27 +713,51 @@
         }
 
         function hasEmptyTile() {
+            for (let r = 0; r < rows; r++) for (let c = 0; c < columns; c++) if (board[r][c] == 0) return true;
+            return false;
+        }
+
+        function checkWin() {
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
-                    if (board[r][c] == 0) return true;
+                    if (board[r][c] === 2048) {
+                        // 檢查是否已經顯示過勝利 (暫不重複顯示，直到新遊戲)
+                        // 這裡為了簡化，只要出現 2048 就結束
+                        triggerVictory();
+                        return;
+                    }
                 }
             }
-            return false;
+        }
+
+        function triggerVictory() {
+            isGameOver = true;
+            
+            // 更新勝利畫面的數據
+            document.getElementById("vic-score").innerText = score;
+            document.getElementById("vic-steps").innerText = steps;
+            document.getElementById("vic-undos").innerText = undoCount;
+
+            document.getElementById("victory-screen").style.display = "flex";
+            playSound('win');
+            startFireworks();
+        }
+        
+        function triggerDefeat() {
+            isGameOver = true;
+            document.getElementById("game-over").style.display = "flex";
+            playSound('gameover');
         }
 
         function checkGameOver() {
             if (hasEmptyTile()) return;
-            
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
                     if (c < columns - 1 && board[r][c] == board[r][c+1]) return;
                     if (r < rows - 1 && board[r][c] == board[r+1][c]) return;
                 }
             }
-            
-            isGameOver = true;
-            document.getElementById("game-over").style.display = "flex";
-            playSound('gameover');
+            triggerDefeat();
         }
 
         // --- 輸入監聽 ---
@@ -563,37 +769,135 @@
         });
 
         let startX, startY;
-        const boardDom = document.getElementById('board');
-
         document.addEventListener('touchstart', (e) => {
             if(e.touches.length > 1) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }, { passive: false });
-
-        document.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-        }, { passive: false });
-
+        document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
         document.addEventListener('touchend', (e) => {
             if(!startX || !startY) return;
             let endX = e.changedTouches[0].clientX;
             let endY = e.changedTouches[0].clientY;
-            let diffX = endX - startX;
-            let diffY = endY - startY;
-
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > 30) {
-                    if (diffX > 0) move('Right'); else move('Left');
+            if (Math.abs(endX - startX) > Math.abs(endY - startY)) {
+                if (Math.abs(endX - startX) > 30) {
+                    if (endX - startX > 0) move('Right'); else move('Left');
                 }
             } else {
-                if (Math.abs(diffY) > 30) {
-                    if (diffY > 0) move('Down'); else move('Up');
+                if (Math.abs(endY - startY) > 30) {
+                    if (endY - startY > 0) move('Down'); else move('Up');
                 }
             }
             startX = null; startY = null;
         });
+
+        // --- 煙火特效 (Canvas) ---
+        let canvas = document.getElementById('fireworks-canvas');
+        let ctx = canvas.getContext('2d');
+        let fireworks = [];
+        let particles = [];
+        let animationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function random(min, max) { return Math.random() * (max - min) + min; }
+
+        class Firework {
+            constructor() {
+                this.x = random(window.innerWidth * 0.1, window.innerWidth * 0.9);
+                this.y = window.innerHeight;
+                this.targetY = random(window.innerHeight * 0.1, window.innerHeight * 0.4);
+                this.speed = random(5, 8);
+                this.angle = -Math.PI / 2 + random(-0.1, 0.1);
+                this.vx = Math.cos(this.angle) * this.speed;
+                this.vy = Math.sin(this.angle) * this.speed;
+                this.hue = Math.floor(random(0, 360));
+                this.brightness = random(50, 70);
+                this.dead = false;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.05;
+                if (this.vy >= 0 || this.y <= this.targetY) {
+                    this.dead = true;
+                    createParticles(this.x, this.y, this.hue);
+                    playSound('firework');
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, ${this.brightness}%)`;
+                ctx.fill();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, hue) {
+                this.x = x; this.y = y;
+                this.hue = hue + random(-20, 20);
+                const angle = random(0, Math.PI * 2);
+                const speed = random(1, 10); 
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.friction = 0.92;
+                this.gravity = 0.15;
+                this.alpha = 1;
+                this.decay = random(0.005, 0.02);
+                this.brightness = random(50, 80);
+            }
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+                if (Math.random() < 0.1) this.brightness = 100; else this.brightness = random(50, 80);
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, random(1, 2.5), 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, ${this.brightness}%)`;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createParticles(x, y, hue) {
+            const particleCount = 80; 
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle(x, y, hue));
+        }
+
+        function loop() {
+            animationId = requestAnimationFrame(loop);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'lighter';
+            if (Math.random() < 0.15) { 
+                fireworks.push(new Firework());
+                if (Math.random() < 0.3) fireworks.push(new Firework());
+            }
+            fireworks = fireworks.filter(f => !f.dead);
+            particles = particles.filter(p => p.alpha > 0);
+            fireworks.forEach(f => { f.update(); f.draw(); });
+            particles.forEach(p => { p.update(); p.draw(); });
+        }
+
+        function startFireworks() { resizeCanvas(); loop(); }
+        function stopFireworks() {
+            if (animationId) cancelAnimationFrame(animationId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            fireworks = []; particles = [];
+        }
     </script>
 </body>
 </html>
