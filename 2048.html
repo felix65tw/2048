@@ -7,7 +7,7 @@
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 380px; /* 從 320px 改為 352px (放大10%) */
+            --board-size-mobile: 388px; /* 從 352px 改為 388px (放大10%) */
             --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
@@ -198,25 +198,28 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            width: 80%;
-            max-width: 300px;
+            width: 90%;
+            max-width: 400px; /* 增加最大寬度以容納5個按鈕 */
         }
 
         .settings-item {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
             font-size: 18px;
             font-weight: bold;
+            gap: 15px;
         }
 
         /* 重新設計棋盤大小選擇器 - 符合2048風格 */
         .size-selector {
             display: flex;
-            flex-wrap: wrap;
             gap: 8px;
             justify-content: center;
-            margin-top: 5px;
+            flex-wrap: nowrap; /* 確保不換行 */
+            width: 100%;
+            overflow-x: auto; /* 如果寬度不夠，可以橫向滾動 */
+            padding-bottom: 5px;
         }
 
         .size-option {
@@ -224,9 +227,9 @@
             color: #776e65;
             border: none;
             border-radius: 3px;
-            width: 60px;
-            height: 60px;
-            font-size: 18px;
+            width: 55px; /* 稍微減小寬度以容納5個按鈕 */
+            height: 55px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -234,6 +237,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* 防止按鈕被壓縮 */
         }
 
         .size-option:hover {
@@ -338,34 +342,88 @@
         @media screen and (max-width: 520px) {
             /* 整體放大10% */
             :root { 
-                --board-size-mobile: 352px; /* 從 320px 改為 352px */
+                --board-size-mobile: 388px; /* 從 352px 改為 388px */
                 --grid-gap: 5px; 
             }
             
-            .controls-container { width: var(--board-size-mobile); }
+            .controls-container { 
+                width: var(--board-size-mobile); 
+            }
+            
             #board {
                 width: var(--board-size-mobile);
                 height: var(--board-size-mobile);
-                padding: 5px; gap: 5px;
+                padding: 5px; 
+                gap: 5px;
             }
             
-            h1 { font-size: 36px; }
-            .neon-text { font-size: 50px; }
-            .size-4 .tile { font-size: 35px; }
-            .size-6 .tile { font-size: 20px; }
-            .size-8 .tile { font-size: 14px; }
+            h1 { 
+                font-size: 40px; /* 適度放大標題 */
+            }
             
-            .victory-stats { padding: 15px 30px; }
-            .stat-val { font-size: 24px; }
+            .neon-text { 
+                font-size: 50px; 
+            }
+            
+            /* 棋盤內文字放大 */
+            .size-4 .tile { 
+                font-size: 40px; /* 從35px增加到40px */
+            }
+            
+            .size-6 .tile { 
+                font-size: 25px; /* 從20px增加到25px */
+            }
+            
+            .size-8 .tile { 
+                font-size: 18px; /* 從14px增加到18px */
+            }
+            
+            /* 高位數微調 - 手機版也相應放大 */
+            .size-4 .tile.x128, 
+            .size-4 .tile.x256, 
+            .size-4 .tile.x512 { 
+                font-size: 35px; /* 適度放大 */
+            }
+            
+            .size-4 .tile.x1024, 
+            .size-4 .tile.x2048 { 
+                font-size: 28px; /* 適度放大 */
+            }
+            
+            .victory-stats { 
+                padding: 15px 30px; 
+            }
+            
+            .stat-val { 
+                font-size: 24px; 
+            }
             
             /* 隱藏提示文字 */
-            .instructions { display: none; }
+            .instructions { 
+                display: none; 
+            }
             
             /* 手機版調整棋盤大小選擇器 */
             .size-option {
-                width: 50px;
-                height: 50px;
-                font-size: 16px;
+                width: 52px; /* 從50px增加到52px，以匹配整體放大 */
+                height: 52px; /* 從50px增加到52px */
+                font-size: 15px; /* 適度放大字體 */
+            }
+            
+            /* 設定內容寬度調整 */
+            .settings-content {
+                width: 95%;
+                max-width: 360px;
+            }
+            
+            /* 分數框適度放大 */
+            .score-box {
+                padding: 6px 18px;
+                min-width: 66px;
+            }
+            
+            .score-val {
+                font-size: 20px; /* 從18px增加到20px */
             }
         }
     </style>
@@ -404,7 +462,7 @@
         <div id="settings-screen" class="overlay">
             <h2 style="font-size:30px; margin-bottom:20px;">設 定</h2>
             <div class="settings-content">
-                <div class="settings-item" style="flex-direction: column; align-items: center; gap: 10px;">
+                <div class="settings-item">
                     <span>棋盤大小</span>
                     <div class="size-selector" id="size-selector">
                         <button class="size-option" data-size="3">3×3</button>
