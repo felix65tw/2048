@@ -155,6 +155,12 @@
             gap: var(--grid-gap);
         }
 
+        /* 8x8棋盤格線調整 - 按比例變細 */
+        .size-8 #board {
+            padding: 5px;  /* 原本是10px，現在減半 */
+            gap: 5px;      /* 原本是10px，現在減半 */
+        }
+
         .tile {
             width: 100%; height: 100%;
             background-color: var(--tile-base-color);
@@ -257,7 +263,7 @@
         .size-8 .tile.x128, .size-8 .tile.x256, .size-8 .tile.x512 { font-size: 18px; }
         .size-8 .tile.x1024, .size-8 .tile.x2048 { font-size: 14px; }
 
-        /* --- Overlay 通用樣式 (設定、勝利、失敗) --- */
+        /* --- Overlay 通用樣式 --- */
         .overlay {
             display: none;
             position: absolute;
@@ -338,13 +344,13 @@
             box-shadow: 0 0 10px rgba(242, 177, 121, 0.5);
         }
 
-        /* --- 遊戲結束畫面 (失敗) --- */
+        /* --- 遊戲結束畫面 --- */
         #game-over {
             background-color: rgba(238, 228, 218, 0.73);
             color: #776e65;
         }
 
-        /* --- 勝利畫面 (全螢幕特效) --- */
+        /* --- 勝利畫面 --- */
         #victory-screen {
             position: fixed; 
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -446,6 +452,12 @@
                 padding: 5px; 
                 gap: 5px;
                 margin-top: 0.5vh;
+            }
+            
+            /* 手機版中針對8x8的調整 */
+            .size-8 #board {
+                padding: 2.5px;  /* 手機版更細 */
+                gap: 2.5px;      /* 手機版更細 */
             }
             
             h1 { 
@@ -1251,7 +1263,7 @@
             return { board: newBoard, moved, score };
         }
         
-        // 改進的AI評估函數 - 使用Expectimax算法思想
+        // 改進的AI評估函數
         function evaluateBoardImproved(board) {
             let score = 0;
             
@@ -1367,7 +1379,7 @@
             return score;
         }
 
-        // --- 煙火特效 (Canvas) ---
+        // --- 煙火特效 ---
         let canvas = document.getElementById('fireworks-canvas');
         let ctx = canvas.getContext('2d');
         let fireworks = [];
