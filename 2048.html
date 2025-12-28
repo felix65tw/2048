@@ -7,7 +7,7 @@
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 370px; /* 從 352px 改為 388px (放大10%) */
+            --board-size-mobile: 377px; /* 從 352px 改為 388px (放大10%) */
             --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
@@ -346,8 +346,15 @@
                 --grid-gap: 5px; 
             }
             
+            /* 將整體遊戲區域向上移動四分之一高度 */
+            body {
+                justify-content: flex-start;
+                padding-top: 10vh; /* 減少頂部空間，使整體向上移動 */
+            }
+            
             .controls-container { 
                 width: var(--board-size-mobile); 
+                margin-top: 2vh; /* 微調控制列的頂部間距 */
             }
             
             #board {
@@ -355,6 +362,7 @@
                 height: var(--board-size-mobile);
                 padding: 5px; 
                 gap: 5px;
+                margin-top: 1vh; /* 微調棋盤的頂部間距 */
             }
             
             h1 { 
