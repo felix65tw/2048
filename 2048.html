@@ -120,7 +120,7 @@
             font-size: 18px;
         }
 
-        /* AI統計信息容器 - 放在新遊戲和撤銷之間 */
+        /* AI統計信息容器 */
         .ai-stats-container {
             display: flex;
             gap: 10px;
@@ -158,7 +158,7 @@
         .tile {
             width: 100%; height: 100%;
             background-color: var(--tile-base-color);
-            border-radius: 3px;
+            border-radius: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -166,6 +166,21 @@
             color: #776e65;
             animation: pop 0.2s ease-in;
             user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 棋子立體效果 */
+        .tile::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
         }
 
         /* 字體大小 RWD */
@@ -181,18 +196,60 @@
             100% { transform: scale(1); }
         }
 
-        /* 數字顏色 */
-        .x2 { background-color: #eee4da; }
-        .x4 { background-color: #ede0c8; }
-        .x8 { background-color: #f2b179; color: #f9f6f2; }
-        .x16 { background-color: #f59563; color: #f9f6f2; }
-        .x32 { background-color: #f67c5f; color: #f9f6f2; }
-        .x64 { background-color: #f65e3b; color: #f9f6f2; }
-        .x128 { background-color: #edcf72; color: #f9f6f2; box-shadow: 0 0 30px 5px rgba(243, 215, 116, 0.4); } 
-        .x256 { background-color: #edcc61; color: #f9f6f2; box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.5); }
-        .x512 { background-color: #edc850; color: #f9f6f2; }
-        .x1024 { background-color: #edc53f; color: #f9f6f2; }
-        .x2048 { background-color: #edc22e; color: #f9f6f2; box-shadow: 0 0 30px 10px rgba(237, 194, 46, 0.6); }
+        /* 數字顏色 - 添加立體陰影效果 */
+        .x2 { 
+            background: linear-gradient(135deg, #eee4da 0%, #e0d8c8 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .x4 { 
+            background: linear-gradient(135deg, #ede0c8 0%, #d8c8a8 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .x8 { 
+            background: linear-gradient(135deg, #f2b179 0%, #e09e5f 100%);
+            color: #f9f6f2;
+            box-shadow: 0 4px 12px rgba(242, 177, 121, 0.3);
+        }
+        .x16 { 
+            background: linear-gradient(135deg, #f59563 0%, #e08553 100%);
+            color: #f9f6f2;
+            box-shadow: 0 4px 12px rgba(245, 149, 99, 0.3);
+        }
+        .x32 { 
+            background: linear-gradient(135deg, #f67c5f 0%, #e06c4f 100%);
+            color: #f9f6f2;
+            box-shadow: 0 4px 12px rgba(246, 124, 95, 0.3);
+        }
+        .x64 { 
+            background: linear-gradient(135deg, #f65e3b 0%, #e04e2b 100%);
+            color: #f9f6f2;
+            box-shadow: 0 4px 12px rgba(246, 94, 59, 0.3);
+        }
+        .x128 { 
+            background: linear-gradient(135deg, #edcf72 0%, #ddbf62 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 30px 5px rgba(243, 215, 116, 0.4);
+        }
+        .x256 { 
+            background: linear-gradient(135deg, #edcc61 0%, #ddbc51 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.5);
+        }
+        .x512 { 
+            background: linear-gradient(135deg, #edc850 0%, #ddb840 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 30px 10px rgba(237, 200, 80, 0.4);
+        }
+        .x1024 { 
+            background: linear-gradient(135deg, #edc53f 0%, #ddb52f 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 30px 10px rgba(237, 197, 63, 0.4);
+        }
+        .x2048 { 
+            background: linear-gradient(135deg, #edc22e 0%, #ddb21e 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 30px 10px rgba(237, 194, 46, 0.6);
+        }
 
         /* 高位數微調 */
         .size-4 .tile.x128, .size-4 .tile.x256, .size-4 .tile.x512 { font-size: 40px; }
@@ -239,7 +296,7 @@
             gap: 15px;
         }
 
-        /* 重新設計棋盤大小選擇器 - 符合2048風格 */
+        /* 棋盤大小選擇器 */
         .size-selector {
             display: flex;
             gap: 8px;
@@ -325,7 +382,7 @@
             100% { opacity: 0.9; transform: scale(1.05); }
         }
 
-        /* 勝利統計數據 - 修改為三行顯示 */
+        /* 勝利統計數據 */
         .victory-stats {
             display: flex;
             flex-direction: column;
@@ -373,15 +430,14 @@
                 --grid-gap: 5px; 
             }
             
-            /* 將整體遊戲區域再往上移動四分之一 - 減少頂部空間 */
             body {
                 justify-content: flex-start;
-                padding-top: 3vh; /* 從5vh改為3vh，再往上移動 */
+                padding-top: 3vh;
             }
             
             .controls-container { 
                 width: var(--board-size-mobile); 
-                margin-top: 1vh; /* 進一步減少頂部間距 */
+                margin-top: 1vh;
             }
             
             #board {
@@ -389,7 +445,7 @@
                 height: var(--board-size-mobile);
                 padding: 5px; 
                 gap: 5px;
-                margin-top: 0.5vh; /* 進一步減少頂部間距 */
+                margin-top: 0.5vh;
             }
             
             h1 { 
@@ -400,7 +456,6 @@
                 font-size: 50px; 
             }
             
-            /* 棋盤內文字放大 */
             .size-4 .tile { 
                 font-size: 36px;
             }
@@ -413,7 +468,6 @@
                 font-size: 16px;
             }
             
-            /* 高位數微調 - 手機版也相應調整 */
             .size-4 .tile.x128, 
             .size-4 .tile.x256, 
             .size-4 .tile.x512 { 
@@ -433,25 +487,21 @@
                 font-size: 24px; 
             }
             
-            /* 隱藏提示文字 */
             .instructions { 
                 display: none; 
             }
             
-            /* 手機版調整棋盤大小選擇器 */
             .size-option {
                 width: 50px;
                 height: 50px;
                 font-size: 14px;
             }
             
-            /* 設定內容寬度調整 */
             .settings-content {
                 width: 95%;
                 max-width: 340px;
             }
             
-            /* 分數框適度放大 */
             .score-box {
                 padding: 5px 15px;
                 min-width: 60px;
@@ -461,7 +511,6 @@
                 font-size: 18px;
             }
             
-            /* 手機版按鈕調整 */
             .buttons-row {
                 flex-wrap: wrap;
                 justify-content: center;
@@ -472,7 +521,6 @@
                 font-size: 14px;
             }
             
-            /* AI統計信息在手機版調整 */
             .ai-stats-container {
                 font-size: 10px;
                 gap: 5px;
@@ -487,7 +535,6 @@
 <body>
 
     <div class="controls-container">
-        <!-- 頂部：標題、分數、設定 -->
         <div class="header-row">
             <h1 id="title-2048">2048</h1>
             <div class="scores-wrapper">
@@ -495,7 +542,6 @@
                     <span class="score-label">Steps</span>
                     <span class="score-val" id="steps">0</span>
                 </div>
-                <!-- 測試獲勝: 點3次 -->
                 <div class="score-box" id="score-box-trigger">
                     <span class="score-label">Score</span>
                     <span class="score-val" id="score">0</span>
@@ -504,11 +550,9 @@
             </div>
         </div>
         
-        <!-- 底部：新遊戲、AI統計、撤銷 -->
         <div class="buttons-row">
             <button class="btn" onclick="initGame()">新遊戲</button>
             
-            <!-- AI統計信息放在新遊戲和撤銷之間 -->
             <div class="ai-stats-container" id="ai-stats-container">
                 <div class="ai-stat-item">AI步數: <span id="ai-moves">0</span></div>
                 <div class="ai-stat-item">AI速度: <span id="ai-speed">慢</span></div>
@@ -518,10 +562,8 @@
         </div>
     </div>
 
-    <!-- 遊戲棋盤區域 -->
     <div id="board">
         
-        <!-- 設定選單 Overlay -->
         <div id="settings-screen" class="overlay">
             <h2 style="font-size:30px; margin-bottom:20px;">設 定</h2>
             <div class="settings-content">
@@ -544,7 +586,6 @@
             </div>
         </div>
 
-        <!-- 失敗畫面 Overlay -->
         <div id="game-over" class="overlay">
             <p style="font-size:30px; font-weight:bold;">遊戲結束!</p>
             <div style="display:flex; gap:10px;">
@@ -553,16 +594,13 @@
             </div>
         </div>
         
-        <!-- 格子會動態生成在這裡 -->
     </div>
 
-    <!-- 勝利畫面 Overlay (全螢幕) -->
     <div id="victory-screen" class="overlay">
         <canvas id="fireworks-canvas"></canvas>
         <div class="victory-content">
             <div class="neon-text">YOU WIN!</div>
             
-            <!-- 勝利統計資訊 (改為三行顯示) -->
             <div class="victory-stats">
                 <div class="stat-item">
                     <span class="stat-label">分數</span>
@@ -578,7 +616,6 @@
                 </div>
             </div>
 
-            <!-- 僅保留新遊戲 -->
             <button class="btn btn-victory-new" onclick="initGame()">新遊戲</button>
         </div>
     </div>
@@ -613,8 +650,11 @@
         // AI標題點擊計數器
         let titleClickCount = 0;
         let titleClickTimer = null;
+        
+        // 權重矩陣 - 蛇形權重
+        let weightMatrix = [];
 
-        // --- 音效系統 (Web Audio API) ---
+        // --- 音效系統 ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
@@ -770,6 +810,21 @@
             });
         }
 
+        // 生成權重矩陣
+        function generateWeightMatrix() {
+            weightMatrix = [];
+            for (let r = 0; r < rows; r++) {
+                weightMatrix[r] = [];
+                for (let c = 0; c < columns; c++) {
+                    if (r % 2 === 0) {
+                        weightMatrix[r][c] = (rows - r - 1) * columns + (columns - c - 1);
+                    } else {
+                        weightMatrix[r][c] = (rows - r - 1) * columns + c;
+                    }
+                }
+            }
+        }
+
         function initGame() {
             closeSettings();
             
@@ -801,6 +856,8 @@
             boardEl.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
             boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
             boardEl.className = `size-${size}`;
+
+            generateWeightMatrix();
 
             renderBoard();
             setTwo();
@@ -920,7 +977,6 @@
                 document.getElementById("score").innerText = score;
                 document.getElementById("steps").innerText = steps;
                 
-                // 更新棋盤而不重畫所有格子
                 updateBoardWithoutRerender();
                 
                 setTwo();
@@ -935,7 +991,6 @@
             return moved;
         }
         
-        // 更新棋盤而不重新渲染所有格子
         function updateBoardWithoutRerender() {
             const tiles = document.querySelectorAll(".tile");
             let tileIndex = 0;
@@ -968,7 +1023,6 @@
                 let c = Math.floor(Math.random() * columns);
                 if (board[r][c] == 0) {
                     board[r][c] = Math.random() > 0.1 ? 2 : 4;
-                    // 更新棋盤而不重畫所有格子
                     updateBoardWithoutRerender();
                     found = true;
                 }
@@ -1063,7 +1117,7 @@
             startX = null; startY = null;
         });
 
-        // --- AI託管功能 ---
+        // --- 改進的AI託管功能 ---
         function toggleAI() {
             if (aiEnabled) {
                 stopAI();
@@ -1074,19 +1128,14 @@
         
         function startAI() {
             aiEnabled = true;
-            
             document.getElementById('ai-stats-container').classList.add('visible');
-            
             document.getElementById('ai-speed').innerText = "慢";
-            
             aiInterval = setInterval(makeAIMove, aiSpeedMap[aiSpeed]);
         }
         
         function stopAI() {
             aiEnabled = false;
-            
             document.getElementById('ai-stats-container').classList.remove('visible');
-            
             if (aiInterval) {
                 clearInterval(aiInterval);
                 aiInterval = null;
@@ -1118,15 +1167,18 @@
             let bestScore = -Infinity;
             let bestMove = null;
             
+            // 對每個方向進行評估
             for (const dir of directions) {
-                const testBoard = JSON.parse(JSON.stringify(board));
-                const { board: newBoard, moved, score: moveScore } = simulateMove(testBoard, dir);
+                // 創建棋盤副本進行模擬
+                const { board: newBoard, moved, score: moveScore } = simulateMove(board, dir);
                 
                 if (!moved) continue;
                 
-                const moveEval = evaluateBoard(newBoard);
+                // 使用改進的評估函數
+                const moveEval = evaluateBoardImproved(newBoard);
                 
-                const totalScore = moveEval + moveScore * 0.1;
+                // 綜合評分
+                const totalScore = moveEval + moveScore * 0.5;
                 
                 if (totalScore > bestScore) {
                     bestScore = totalScore;
@@ -1199,72 +1251,47 @@
             return { board: newBoard, moved, score };
         }
         
-        function evaluateBoard(board) {
+        // 改進的AI評估函數 - 使用Expectimax算法思想
+        function evaluateBoardImproved(board) {
             let score = 0;
             
+            // 1. 空格子數量（最重要因素）
             let emptyCells = 0;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
                     if (board[r][c] === 0) emptyCells++;
                 }
             }
-            score += emptyCells * 10;
+            score += emptyCells * 100;
             
+            // 2. 最大數字位置（鼓勵放在角落）
             let maxTile = 0;
-            let maxTilePos = { r: 0, c: 0 };
+            let maxTileR = 0, maxTileC = 0;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
-                    if (board[r][c] > maxTile) {
-                        maxTile = board[r][c];
-                        maxTilePos = { r, c };
+                    const val = board[r][c];
+                    if (val > maxTile) {
+                        maxTile = val;
+                        maxTileR = r;
+                        maxTileC = c;
                     }
                 }
             }
             
-            const corners = [
-                { r: 0, c: 0 },
-                { r: 0, c: columns - 1 },
-                { r: rows - 1, c: 0 },
-                { r: rows - 1, c: columns - 1 }
-            ];
-            
-            let isInCorner = false;
-            for (const corner of corners) {
-                if (maxTilePos.r === corner.r && maxTilePos.c === corner.c) {
-                    isInCorner = true;
-                    break;
-                }
+            // 角落獎勵
+            const isCorner = (maxTileR === 0 || maxTileR === rows-1) && 
+                            (maxTileC === 0 || maxTileC === columns-1);
+            if (isCorner) {
+                score += maxTile * 5;
             }
             
-            if (isInCorner) {
-                score += maxTile * 2;
-            }
-            
-            let monotonicityScore = 0;
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < columns - 1; c++) {
-                    if (board[r][c] >= board[r][c + 1]) {
-                        monotonicityScore += board[r][c] + board[r][c + 1];
-                    }
-                }
-            }
-            
-            for (let c = 0; c < columns; c++) {
-                for (let r = 0; r < rows - 1; r++) {
-                    if (board[r][c] >= board[r + 1][c]) {
-                        monotonicityScore += board[r][c] + board[r + 1][c];
-                    }
-                }
-            }
-            
-            score += monotonicityScore * 0.1;
-            
-            let smoothnessScore = 0;
+            // 3. 平滑性（相鄰格子值接近）
+            let smoothness = 0;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns - 1; c++) {
                     if (board[r][c] > 0 && board[r][c + 1] > 0) {
                         const diff = Math.abs(Math.log2(board[r][c]) - Math.log2(board[r][c + 1]));
-                        smoothnessScore -= diff;
+                        smoothness -= diff;
                     }
                 }
             }
@@ -1273,12 +1300,69 @@
                 for (let r = 0; r < rows - 1; r++) {
                     if (board[r][c] > 0 && board[r + 1][c] > 0) {
                         const diff = Math.abs(Math.log2(board[r][c]) - Math.log2(board[r + 1][c]));
-                        smoothnessScore -= diff;
+                        smoothness -= diff;
+                    }
+                }
+            }
+            score += smoothness * 3;
+            
+            // 4. 單調性（數字遞增/遞減）
+            let monotonicity = 0;
+            
+            // 檢查行單調性
+            for (let r = 0; r < rows; r++) {
+                let increases = 0, decreases = 0;
+                for (let c = 0; c < columns - 1; c++) {
+                    const current = board[r][c] || 0;
+                    const next = board[r][c + 1] || 0;
+                    if (current > next) decreases++;
+                    else if (current < next) increases++;
+                }
+                monotonicity += Math.max(increases, decreases);
+            }
+            
+            // 檢查列單調性
+            for (let c = 0; c < columns; c++) {
+                let increases = 0, decreases = 0;
+                for (let r = 0; r < rows - 1; r++) {
+                    const current = board[r][c] || 0;
+                    const next = board[r + 1][c] || 0;
+                    if (current > next) decreases++;
+                    else if (current < next) increases++;
+                }
+                monotonicity += Math.max(increases, decreases);
+            }
+            score += monotonicity * 10;
+            
+            // 5. 合併潛力
+            let mergePotential = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns - 1; c++) {
+                    if (board[r][c] > 0 && board[r][c] === board[r][c + 1]) {
+                        mergePotential += board[r][c] * 2;
                     }
                 }
             }
             
-            score += smoothnessScore * 5;
+            for (let c = 0; c < columns; c++) {
+                for (let r = 0; r < rows - 1; r++) {
+                    if (board[r][c] > 0 && board[r][c] === board[r + 1][c]) {
+                        mergePotential += board[r][c] * 2;
+                    }
+                }
+            }
+            score += mergePotential * 2;
+            
+            // 6. 權重矩陣位置得分
+            let positionScore = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    if (board[r][c] > 0) {
+                        positionScore += board[r][c] * weightMatrix[r][c];
+                    }
+                }
+            }
+            score += positionScore * 0.05;
             
             return score;
         }
