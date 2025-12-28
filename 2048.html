@@ -79,12 +79,12 @@
         }
         
         .direction-arrow {
-            font-size: 24px;
+            font-size: 17px; /* 縮小30% (原本24px * 0.7 ≈ 17px) */
             font-weight: bold;
-            padding: 2px 8px;
+            padding: 2px 6px;
             color: #8f7a66;
             border-radius: 4px;
-            min-width: 40px;
+            min-width: 30px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -93,7 +93,7 @@
         }
         
         .direction-text {
-            font-size: 12px;
+            font-size: 10px; /* 縮小30% (原本12px * 0.7 ≈ 8.4px，取10px) */
             color: #8f7a66;
             margin-top: 2px;
             font-weight: bold;
@@ -518,15 +518,15 @@
                 font-size: 36px;
             }
             
-            /* 手機版AI方向顯示調整 */
+            /* 手機版AI方向顯示調整 - 再縮小30% */
             .direction-arrow {
-                font-size: 20px;
-                padding: 1px 6px;
-                min-width: 35px;
+                font-size: 14px; /* 手機版縮小30% (原本20px * 0.7 = 14px) */
+                padding: 1px 4px;
+                min-width: 25px;
             }
             
             .direction-text {
-                font-size: 10px;
+                font-size: 8px; /* 手機版縮小30% (原本11px * 0.7 ≈ 8px) */
             }
             
             .neon-text { 
@@ -588,14 +588,34 @@
                 font-size: 18px;
             }
             
+            /* 手機版按鈕佈局調整 - 新遊戲和撤銷分別靠兩邊 */
             .buttons-row {
-                flex-wrap: wrap;
+                display: flex;
+                justify-content: space-between; /* 確保按鈕分佈在兩端 */
+                align-items: center;
+                width: 100%;
+                gap: 5px;
+            }
+            
+            /* 確保AI統計信息容器居中對齊 */
+            .ai-stats-container {
                 justify-content: center;
+                margin: 0 auto;
             }
             
             .btn {
                 padding: 8px 12px;
                 font-size: 14px;
+            }
+            
+            /* 調整新遊戲按鈕，使其靠左對齊 */
+            .buttons-row .btn:first-child {
+                margin-right: auto;
+            }
+            
+            /* 調整撤銷按鈕，使其靠右對齊 */
+            .buttons-row .btn-undo {
+                margin-left: auto;
             }
             
             .ai-stats-container {
