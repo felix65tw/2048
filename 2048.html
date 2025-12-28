@@ -404,10 +404,10 @@
             box-shadow: 0 0 10px rgba(242, 177, 121, 0.5);
         }
 
-        /* 目標數字選擇器樣式 */
+        /* 目標數字選擇器樣式 - 調整為更緊湊的佈局 */
         .target-selector {
             display: flex;
-            gap: 8px;
+            gap: 6px; /* 減少間距 */
             justify-content: center;
             flex-wrap: nowrap;
             width: 100%;
@@ -420,9 +420,9 @@
             color: #776e65;
             border: none;
             border-radius: 3px;
-            width: 55px;
-            height: 55px;
-            font-size: 16px;
+            width: 50px; /* 減小寬度 */
+            height: 50px; /* 減小高度 */
+            font-size: 14px; /* 減小字體 */
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -617,9 +617,9 @@
             }
             
             .size-option, .target-option {
-                width: 50px;
-                height: 50px;
-                font-size: 14px;
+                width: 45px; /* 手機版更小 */
+                height: 45px;
+                font-size: 12px;
             }
             
             .settings-content {
@@ -739,6 +739,8 @@
                 <div class="settings-item">
                     <span>目標數字</span>
                     <div class="target-selector" id="target-selector">
+                        <button class="target-option" data-target="128">128</button>
+                        <button class="target-option" data-target="256">256</button>
                         <button class="target-option" data-target="512">512</button>
                         <button class="target-option" data-target="1024">1024</button>
                         <button class="target-option active" data-target="2048">2048</button>
@@ -806,7 +808,7 @@
         let soundEnabled = true;
         let gameHistory = []; 
         let selectedGridSize = 4;
-        let targetNumber = 2048;
+        let targetNumber = 2048; // 默認改回2048
         let hasWon = false; // 標記是否已經勝利
         
         // --- AI相關變數 ---
@@ -1086,7 +1088,9 @@
 
         function undo() {
             // 如果已經勝利，禁止撤銷
-            if (hasWon) return;
+            if (hasWon) {
+                return;
+            }
             
             if (gameHistory.length === 0) return;
             const lastState = gameHistory.pop();
@@ -1109,10 +1113,16 @@
 
         function updateUndoButton() {
             const undoBtn = document.getElementById("undo-btn");
-            if (gameHistory.length === 0) {
+            // 如果已經勝利，撤銷按鈕應該變為灰色
+            if (hasWon) {
                 undoBtn.classList.add('disabled');
+                undoBtn.disabled = true;
+            } else if (gameHistory.length === 0) {
+                undoBtn.classList.add('disabled');
+                undoBtn.disabled = false; // 仍然可以點擊（用於觸發測試模式）
             } else {
                 undoBtn.classList.remove('disabled');
+                undoBtn.disabled = false;
             }
         }
 
@@ -1120,8 +1130,13 @@
         function handleUndoClick() {
             const undoBtn = document.getElementById("undo-btn");
             
-            // 如果按鈕是灰色(disabled)狀態
-            if (undoBtn.classList.contains('disabled')) {
+            // 如果已經勝利，直接返回
+            if (hasWon) {
+                return;
+            }
+            
+            // 如果按鈕是灰色(disabled)狀態但不是因為勝利
+            if (undoBtn.classList.contains('disabled') && !hasWon) {
                 // 增加點擊計數
                 undoClickCount++;
                 
@@ -1443,6 +1458,9 @@
             if (aiEnabled) {
                 stopAI();
             }
+            
+            // 進入勝利畫面後，撤銷按鈕變為灰色
+            updateUndoButton();
         }
         
         // 返回遊戲函數 - 從勝利畫面返回
