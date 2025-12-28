@@ -7,7 +7,7 @@
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 377px; /* 從 352px 改為 388px (放大10%) */
+            --board-size-mobile: 377px; /* 從 388px 改為 377px */
             --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
@@ -55,7 +55,12 @@
             margin: 0;
             line-height: 1;
             color: #776e65;
+            cursor: pointer; /* 讓標題可點擊 */
+            user-select: none;
+            transition: transform 0.1s;
         }
+        
+        h1:active { transform: scale(0.95); }
 
         .scores-wrapper {
             display: flex;
@@ -83,6 +88,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 5px;
         }
 
         /* --- 按鈕樣式 --- */
@@ -112,6 +118,28 @@
             background-color: #776e65;
             padding: 8px 12px;
             font-size: 18px;
+        }
+
+        /* AI統計信息容器 - 放在新遊戲和撤銷之間 */
+        .ai-stats-container {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: #8f7a66;
+            font-weight: bold;
+            opacity: 0; /* 預設隱藏 */
+            transition: opacity 0.3s;
+        }
+        
+        .ai-stats-container.visible {
+            opacity: 1; /* 顯示時 */
+        }
+        
+        .ai-stat-item {
+            background-color: #eee4da;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
         }
 
         /* --- 遊戲棋盤 --- */
@@ -340,9 +368,9 @@
 
         /* --- 手機版 RWD --- */
         @media screen and (max-width: 520px) {
-            /* 整體放大10% */
+            /* 調整為377px */
             :root { 
-                --board-size-mobile: 388px; /* 從 352px 改為 388px */
+                --board-size-mobile: 377px; /* 從 388px 改為 377px */
                 --grid-gap: 5px; 
             }
             
@@ -366,7 +394,7 @@
             }
             
             h1 { 
-                font-size: 40px; /* 適度放大標題 */
+                font-size: 36px; /* 適度調整標題大小 */
             }
             
             .neon-text { 
@@ -375,27 +403,27 @@
             
             /* 棋盤內文字放大 */
             .size-4 .tile { 
-                font-size: 40px; /* 從35px增加到40px */
+                font-size: 36px; /* 從40px調整為36px */
             }
             
             .size-6 .tile { 
-                font-size: 25px; /* 從20px增加到25px */
+                font-size: 22px; /* 從25px調整為22px */
             }
             
             .size-8 .tile { 
-                font-size: 18px; /* 從14px增加到18px */
+                font-size: 16px; /* 從18px調整為16px */
             }
             
-            /* 高位數微調 - 手機版也相應放大 */
+            /* 高位數微調 - 手機版也相應調整 */
             .size-4 .tile.x128, 
             .size-4 .tile.x256, 
             .size-4 .tile.x512 { 
-                font-size: 35px; /* 適度放大 */
+                font-size: 32px; /* 從35px調整為32px */
             }
             
             .size-4 .tile.x1024, 
             .size-4 .tile.x2048 { 
-                font-size: 28px; /* 適度放大 */
+                font-size: 24px; /* 從28px調整為24px */
             }
             
             .victory-stats { 
@@ -413,25 +441,46 @@
             
             /* 手機版調整棋盤大小選擇器 */
             .size-option {
-                width: 52px; /* 從50px增加到52px，以匹配整體放大 */
-                height: 52px; /* 從50px增加到52px */
-                font-size: 15px; /* 適度放大字體 */
+                width: 50px; /* 從52px調整為50px */
+                height: 50px; /* 從52px調整為50px */
+                font-size: 14px; /* 從15px調整為14px */
             }
             
             /* 設定內容寬度調整 */
             .settings-content {
                 width: 95%;
-                max-width: 360px;
+                max-width: 340px;
             }
             
             /* 分數框適度放大 */
             .score-box {
-                padding: 6px 18px;
-                min-width: 66px;
+                padding: 5px 15px;
+                min-width: 60px;
             }
             
             .score-val {
-                font-size: 20px; /* 從18px增加到20px */
+                font-size: 18px; /* 從20px調整為18px */
+            }
+            
+            /* 手機版按鈕調整 */
+            .buttons-row {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            /* AI統計信息在手機版調整 */
+            .ai-stats-container {
+                font-size: 10px;
+                gap: 5px;
+            }
+            
+            .ai-stat-item {
+                padding: 2px 6px;
             }
         }
     </style>
@@ -441,7 +490,7 @@
     <div class="controls-container">
         <!-- 頂部：標題、分數、設定 -->
         <div class="header-row">
-            <h1>2048</h1>
+            <h1 id="title-2048">2048</h1>
             <div class="scores-wrapper">
                 <div class="score-box" id="step-box-trigger">
                     <span class="score-label">Steps</span>
@@ -456,9 +505,16 @@
             </div>
         </div>
         
-        <!-- 底部：新遊戲、撤銷 -->
+        <!-- 底部：新遊戲、AI統計、撤銷 -->
         <div class="buttons-row">
             <button class="btn" onclick="initGame()">新遊戲</button>
+            
+            <!-- AI統計信息放在新遊戲和撤銷之間 -->
+            <div class="ai-stats-container" id="ai-stats-container">
+                <div class="ai-stat-item">AI步數: <span id="ai-moves">0</span></div>
+                <div class="ai-stat-item">AI速度: <span id="ai-speed">慢</span></div>
+            </div>
+            
             <button class="btn btn-undo" id="undo-btn" onclick="undo()" disabled>↩ 撤銷</button>
         </div>
     </div>
@@ -542,6 +598,22 @@
         let soundEnabled = true;
         let gameHistory = []; 
         let selectedGridSize = 4; // 預設選擇 4x4
+        
+        // --- AI相關變數 ---
+        let aiEnabled = false;
+        let aiInterval = null;
+        let aiMoves = 0;
+        let aiSpeed = "slow"; // 固定為慢速500ms/步
+        const aiSpeedMap = {
+            "slow": 500,
+            "medium": 200,
+            "fast": 100,
+            "veryfast": 50
+        };
+        
+        // AI標題點擊計數器
+        let titleClickCount = 0;
+        let titleClickTimer = null;
 
         // --- 音效系統 (Web Audio API) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -611,6 +683,13 @@
                 noiseGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 noise.start(audioCtx.currentTime);
+            } else if (type === 'ai') {
+                // AI音效 - 更輕柔
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+                gainNode.gain.setValueAtTime(0.05, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
             }
         }
 
@@ -666,6 +745,23 @@
             
             // 初始化棋盤大小選擇器
             initSizeSelector();
+            
+            // 初始化標題點擊事件
+            document.getElementById('title-2048').addEventListener('click', function() {
+                titleClickCount++;
+                
+                // 重置計時器
+                clearTimeout(titleClickTimer);
+                titleClickTimer = setTimeout(() => { 
+                    titleClickCount = 0; 
+                }, 1000); // 1秒內點擊有效
+                
+                // 點擊6次觸發AI託管
+                if (titleClickCount === 6) {
+                    toggleAI();
+                    titleClickCount = 0;
+                }
+            });
         }
 
         // 初始化棋盤大小選擇器
@@ -691,6 +787,11 @@
         function initGame() {
             closeSettings(); // 確保設定關閉
             
+            // 停止AI
+            if (aiEnabled) {
+                stopAI();
+            }
+            
             // 使用選擇的棋盤大小
             const size = selectedGridSize;
             rows = size;
@@ -700,12 +801,14 @@
             score = 0;
             steps = 0;
             undoCount = 0;
+            aiMoves = 0;
             isGameOver = false;
             gameHistory = []; 
             updateUndoButton();
 
             document.getElementById("score").innerText = score;
             document.getElementById("steps").innerText = steps;
+            document.getElementById("ai-moves").innerText = aiMoves;
             document.getElementById("game-over").style.display = "none";
             document.getElementById("victory-screen").style.display = "none";
             stopFireworks();
@@ -786,7 +889,7 @@
             return { newRow: row, merged: mergedThisRow };
         }
 
-        function move(direction) {
+        function move(direction, fromAI = false) {
             if (isGameOver || document.getElementById("settings-screen").style.display === "flex") return;
 
             const currentBoardState = JSON.parse(JSON.stringify(board));
@@ -834,14 +937,50 @@
                 updateUndoButton();
                 document.getElementById("score").innerText = score;
                 document.getElementById("steps").innerText = steps;
-                renderBoard();
+                
+                // AI移動時不重畫棋盤，只更新數字
+                if (fromAI) {
+                    updateBoardWithoutRerender();
+                } else {
+                    renderBoard();
+                }
+                
                 setTwo();
                 
-                if (mergedInMove) playSound('merge');
-                else playSound('move');
+                if (mergedInMove && !fromAI) playSound('merge');
+                else if (!fromAI) playSound('move');
 
                 checkWin();
                 checkGameOver();
+            }
+            
+            return moved;
+        }
+        
+        // 更新棋盤而不重新渲染所有格子
+        function updateBoardWithoutRerender() {
+            const tiles = document.querySelectorAll(".tile");
+            let tileIndex = 0;
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    const num = board[r][c];
+                    if (tileIndex < tiles.length) {
+                        const tile = tiles[tileIndex];
+                        if (num > 0) {
+                            tile.innerText = num;
+                            // 移除所有數字類別
+                            tile.className = "tile";
+                            // 添加對應的數字類別
+                            if (num <= 2048) tile.classList.add("x" + num);
+                            else tile.classList.add("x2048");
+                        } else {
+                            tile.innerText = "";
+                            tile.className = "tile";
+                        }
+                        tileIndex++;
+                    }
+                }
             }
         }
 
@@ -853,7 +992,12 @@
                 let c = Math.floor(Math.random() * columns);
                 if (board[r][c] == 0) {
                     board[r][c] = Math.random() > 0.1 ? 2 : 4;
-                    renderBoard();
+                    // AI移動時不重畫棋盤
+                    if (!aiEnabled) {
+                        renderBoard();
+                    } else {
+                        updateBoardWithoutRerender();
+                    }
                     found = true;
                 }
             }
@@ -886,12 +1030,22 @@
             document.getElementById("victory-screen").style.display = "flex";
             playSound('win');
             startFireworks();
+            
+            // 停止AI
+            if (aiEnabled) {
+                stopAI();
+            }
         }
         
         function triggerDefeat() {
             isGameOver = true;
             document.getElementById("game-over").style.display = "flex";
             playSound('gameover');
+            
+            // 停止AI
+            if (aiEnabled) {
+                stopAI();
+            }
         }
 
         function checkGameOver() {
@@ -907,6 +1061,7 @@
 
         // --- 輸入監聽 ---
         document.addEventListener('keyup', (e) => {
+            if (aiEnabled) return; // AI託管時禁用鍵盤控制
             if (e.code == "ArrowLeft") move('Left');
             else if (e.code == "ArrowRight") move('Right');
             else if (e.code == "ArrowUp") move('Up');
@@ -915,6 +1070,7 @@
 
         let startX, startY;
         document.addEventListener('touchstart', (e) => {
+            if (aiEnabled) return; // AI託管時禁用手勢控制
             if(e.touches.length > 1) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -922,6 +1078,7 @@
         }, { passive: false });
         document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
         document.addEventListener('touchend', (e) => {
+            if (aiEnabled) return; // AI託管時禁用手勢控制
             if(!startX || !startY) return;
             let endX = e.changedTouches[0].clientX;
             let endY = e.changedTouches[0].clientY;
@@ -936,6 +1093,248 @@
             }
             startX = null; startY = null;
         });
+
+        // --- AI託管功能 ---
+        function toggleAI() {
+            if (aiEnabled) {
+                stopAI();
+            } else {
+                startAI();
+            }
+        }
+        
+        function startAI() {
+            aiEnabled = true;
+            
+            // 顯示AI統計信息
+            document.getElementById('ai-stats-container').classList.add('visible');
+            
+            // 更新AI速度顯示
+            document.getElementById('ai-speed').innerText = "慢";
+            
+            // 開始AI循環
+            aiInterval = setInterval(makeAIMove, aiSpeedMap[aiSpeed]);
+        }
+        
+        function stopAI() {
+            aiEnabled = false;
+            
+            // 隱藏AI統計信息
+            document.getElementById('ai-stats-container').classList.remove('visible');
+            
+            if (aiInterval) {
+                clearInterval(aiInterval);
+                aiInterval = null;
+            }
+        }
+        
+        function makeAIMove() {
+            if (isGameOver) {
+                stopAI();
+                return;
+            }
+            
+            // AI演算法：基於啟發式評估選擇最佳移動
+            const bestMove = findBestMove();
+            
+            if (bestMove) {
+                const moved = move(bestMove, true); // 傳入true表示來自AI
+                if (moved) {
+                    aiMoves++;
+                    document.getElementById('ai-moves').innerText = aiMoves;
+                    playSound('ai');
+                }
+            } else {
+                // 如果沒有有效移動，停止AI
+                stopAI();
+            }
+        }
+        
+        function findBestMove() {
+            const directions = ['Left', 'Right', 'Up', 'Down'];
+            let bestScore = -Infinity;
+            let bestMove = null;
+            
+            // 遍歷所有可能的方向
+            for (const dir of directions) {
+                // 創建棋盤副本進行模擬
+                const testBoard = JSON.parse(JSON.stringify(board));
+                const { board: newBoard, moved, score: moveScore } = simulateMove(testBoard, dir);
+                
+                if (!moved) continue;
+                
+                // 計算這個移動的得分
+                const moveEval = evaluateBoard(newBoard);
+                
+                // 加上移動本身的分數
+                const totalScore = moveEval + moveScore * 0.1;
+                
+                if (totalScore > bestScore) {
+                    bestScore = totalScore;
+                    bestMove = dir;
+                }
+            }
+            
+            return bestMove;
+        }
+        
+        function simulateMove(board, direction) {
+            const newBoard = JSON.parse(JSON.stringify(board));
+            let moved = false;
+            let score = 0;
+            
+            if (direction === 'Left' || direction === 'Right') {
+                for (let r = 0; r < rows; r++) {
+                    let row = [...newBoard[r]];
+                    const original = JSON.stringify(row);
+                    
+                    if (direction === 'Right') row.reverse();
+                    
+                    // 過濾零值
+                    let filtered = row.filter(num => num !== 0);
+                    
+                    // 合併相鄰相同數字
+                    for (let i = 0; i < filtered.length - 1; i++) {
+                        if (filtered[i] === filtered[i + 1]) {
+                            filtered[i] *= 2;
+                            score += filtered[i];
+                            filtered.splice(i + 1, 1);
+                        }
+                    }
+                    
+                    // 補齊零值
+                    while (filtered.length < columns) filtered.push(0);
+                    
+                    if (direction === 'Right') filtered.reverse();
+                    
+                    newBoard[r] = filtered;
+                    
+                    if (JSON.stringify(newBoard[r]) !== original) moved = true;
+                }
+            } else if (direction === 'Up' || direction === 'Down') {
+                for (let c = 0; c < columns; c++) {
+                    let col = [];
+                    for (let r = 0; r < rows; r++) col.push(newBoard[r][c]);
+                    
+                    const original = JSON.stringify(col);
+                    
+                    if (direction === 'Down') col.reverse();
+                    
+                    // 過濾零值
+                    let filtered = col.filter(num => num !== 0);
+                    
+                    // 合併相鄰相同數字
+                    for (let i = 0; i < filtered.length - 1; i++) {
+                        if (filtered[i] === filtered[i + 1]) {
+                            filtered[i] *= 2;
+                            score += filtered[i];
+                            filtered.splice(i + 1, 1);
+                        }
+                    }
+                    
+                    // 補齊零值
+                    while (filtered.length < rows) filtered.push(0);
+                    
+                    if (direction === 'Down') filtered.reverse();
+                    
+                    // 放回棋盤
+                    for (let r = 0; r < rows; r++) newBoard[r][c] = filtered[r];
+                    
+                    if (JSON.stringify(col) !== JSON.stringify(filtered)) moved = true;
+                }
+            }
+            
+            return { board: newBoard, moved, score };
+        }
+        
+        function evaluateBoard(board) {
+            let score = 0;
+            
+            // 1. 空格子數量（越多越好）
+            let emptyCells = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    if (board[r][c] === 0) emptyCells++;
+                }
+            }
+            score += emptyCells * 10;
+            
+            // 2. 最大數字在角落（更好）
+            let maxTile = 0;
+            let maxTilePos = { r: 0, c: 0 };
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    if (board[r][c] > maxTile) {
+                        maxTile = board[r][c];
+                        maxTilePos = { r, c };
+                    }
+                }
+            }
+            
+            // 檢查最大數字是否在角落
+            const corners = [
+                { r: 0, c: 0 },
+                { r: 0, c: columns - 1 },
+                { r: rows - 1, c: 0 },
+                { r: rows - 1, c: columns - 1 }
+            ];
+            
+            let isInCorner = false;
+            for (const corner of corners) {
+                if (maxTilePos.r === corner.r && maxTilePos.c === corner.c) {
+                    isInCorner = true;
+                    break;
+                }
+            }
+            
+            if (isInCorner) {
+                score += maxTile * 2;
+            }
+            
+            // 3. 單調性評估（相鄰數字遞減）
+            let monotonicityScore = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns - 1; c++) {
+                    if (board[r][c] >= board[r][c + 1]) {
+                        monotonicityScore += board[r][c] + board[r][c + 1];
+                    }
+                }
+            }
+            
+            for (let c = 0; c < columns; c++) {
+                for (let r = 0; r < rows - 1; r++) {
+                    if (board[r][c] >= board[r + 1][c]) {
+                        monotonicityScore += board[r][c] + board[r + 1][c];
+                    }
+                }
+            }
+            
+            score += monotonicityScore * 0.1;
+            
+            // 4. 平滑性（避免過大差異）
+            let smoothnessScore = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns - 1; c++) {
+                    if (board[r][c] > 0 && board[r][c + 1] > 0) {
+                        const diff = Math.abs(Math.log2(board[r][c]) - Math.log2(board[r][c + 1]));
+                        smoothnessScore -= diff;
+                    }
+                }
+            }
+            
+            for (let c = 0; c < columns; c++) {
+                for (let r = 0; r < rows - 1; r++) {
+                    if (board[r][c] > 0 && board[r + 1][c] > 0) {
+                        const diff = Math.abs(Math.log2(board[r][c]) - Math.log2(board[r + 1][c]));
+                        smoothnessScore -= diff;
+                    }
+                }
+            }
+            
+            score += smoothnessScore * 5;
+            
+            return score;
+        }
 
         // --- 煙火特效 (Canvas) ---
         let canvas = document.getElementById('fireworks-canvas');
