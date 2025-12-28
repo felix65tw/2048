@@ -62,6 +62,56 @@
         
         h1:active { transform: scale(0.95); }
 
+        /* AI方向顯示區域 - 在標題和步數之間 */
+        .ai-direction-display {
+            flex-grow: 1;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            margin: 0 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .ai-direction-display.visible {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .direction-arrow {
+            font-size: 32px;
+            font-weight: bold;
+            padding: 5px 15px;
+            background-color: #8f7a66;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            min-width: 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .direction-arrow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
+            border-radius: 6px;
+        }
+        
+        .direction-text {
+            font-size: 14px;
+            color: #8f7a66;
+            margin-top: 3px;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .scores-wrapper {
             display: flex;
             gap: 5px;
@@ -112,7 +162,24 @@
         .btn:active { transform: scale(0.96); }
 
         .btn-undo { background-color: #e78e46; }
-        .btn-undo:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-undo.disabled { 
+            background-color: #ccc; 
+            cursor: not-allowed;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-undo.disabled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
+            border-radius: 5px;
+        }
 
         .btn-settings {
             background-color: #776e65;
@@ -464,6 +531,17 @@
                 font-size: 36px;
             }
             
+            /* 手機版AI方向顯示調整 */
+            .direction-arrow {
+                font-size: 24px;
+                padding: 3px 10px;
+                min-width: 60px;
+            }
+            
+            .direction-text {
+                font-size: 11px;
+            }
+            
             .neon-text { 
                 font-size: 50px; 
             }
@@ -549,6 +627,15 @@
     <div class="controls-container">
         <div class="header-row">
             <h1 id="title-2048">2048</h1>
+            
+            <!-- AI方向顯示區域 -->
+            <div class="ai-direction-display" id="ai-direction-display">
+                <div>
+                    <div class="direction-arrow" id="direction-arrow">→</div>
+                    <div class="direction-text" id="direction-text">向右移動</div>
+                </div>
+            </div>
+            
             <div class="scores-wrapper">
                 <div class="score-box" id="step-box-trigger">
                     <span class="score-label">Steps</span>
@@ -570,7 +657,7 @@
                 <div class="ai-stat-item">AI速度: <span id="ai-speed">慢</span></div>
             </div>
             
-            <button class="btn btn-undo" id="undo-btn" onclick="undo()" disabled>↩ 撤銷</button>
+            <button class="btn btn-undo" id="undo-btn" onclick="handleUndoClick()">↩ 撤銷</button>
         </div>
     </div>
 
@@ -659,9 +746,18 @@
             "veryfast": 50
         };
         
+        // 方向顯示相關變數
+        let lastAIMove = null;
+        let directionDisplayTimer = null;
+        
         // AI標題點擊計數器
         let titleClickCount = 0;
         let titleClickTimer = null;
+        
+        // 數字測試模式相關變數
+        let testModeEnabled = false;
+        let undoClickCount = 0;
+        let undoClickTimer = null;
         
         // 權重矩陣 - 蛇形權重
         let weightMatrix = [];
@@ -844,6 +940,10 @@
                 stopAI();
             }
             
+            // 退出測試模式
+            testModeEnabled = false;
+            undoClickCount = 0;
+            
             const size = selectedGridSize;
             rows = size;
             columns = size;
@@ -897,7 +997,141 @@
         }
 
         function updateUndoButton() {
-            document.getElementById("undo-btn").disabled = gameHistory.length === 0;
+            const undoBtn = document.getElementById("undo-btn");
+            if (gameHistory.length === 0) {
+                undoBtn.classList.add('disabled');
+            } else {
+                undoBtn.classList.remove('disabled');
+            }
+        }
+
+        // 撤銷按鈕點擊處理函數
+        function handleUndoClick() {
+            const undoBtn = document.getElementById("undo-btn");
+            
+            // 如果按鈕是灰色(disabled)狀態
+            if (undoBtn.classList.contains('disabled')) {
+                // 增加點擊計數
+                undoClickCount++;
+                
+                // 清除之前的計時器
+                clearTimeout(undoClickTimer);
+                
+                // 設置新的計時器，500毫秒後重置計數
+                undoClickTimer = setTimeout(() => {
+                    undoClickCount = 0;
+                }, 500);
+                
+                // 如果點擊了5次
+                if (undoClickCount === 5) {
+                    // 進入數字測試模式
+                    enterNumberTestMode();
+                    undoClickCount = 0;
+                    return;
+                }
+            } else {
+                // 正常執行撤銷
+                undo();
+            }
+        }
+
+        // 進入數字測試模式
+        function enterNumberTestMode() {
+            // 停止AI託管
+            if (aiEnabled) {
+                stopAI();
+            }
+            
+            // 設置測試模式標誌
+            testModeEnabled = true;
+            
+            // 清空棋盤
+            board = Array.from({ length: rows }, () => Array(columns).fill(0));
+            
+            // 生成測試數字序列：2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048
+            const testNumbers = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048];
+            
+            // 從左上角開始填充
+            let numberIndex = 0;
+            let filledCount = 0;
+            const totalCells = rows * columns;
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    if (numberIndex < testNumbers.length && filledCount < totalCells) {
+                        board[r][c] = testNumbers[numberIndex];
+                        numberIndex++;
+                        filledCount++;
+                    } else {
+                        // 如果測試數字用完了，填充剩下的格子為2
+                        board[r][c] = 2;
+                    }
+                }
+            }
+            
+            // 更新顯示
+            updateBoardWithoutRerender();
+            
+            // 播放特殊音效
+            playTestModeSound();
+            
+            // 顯示測試模式提示
+            showTestModeNotification();
+        }
+        
+        function playTestModeSound() {
+            if (!soundEnabled || audioCtx.state === 'suspended') {
+                audioCtx.resume();
+                if (!soundEnabled) return;
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            
+            // 測試模式音效
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.linearRampToValueAtTime(659.25, now + 0.1); // E5
+            osc.frequency.linearRampToValueAtTime(783.99, now + 0.2); // G5
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+        
+        function showTestModeNotification() {
+            // 創建通知元素
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '50%';
+            notification.style.left = '50%';
+            notification.style.transform = 'translate(-50%, -50%)';
+            notification.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            notification.style.color = 'white';
+            notification.style.padding = '20px 30px';
+            notification.style.borderRadius = '10px';
+            notification.style.fontSize = '20px';
+            notification.style.fontWeight = 'bold';
+            notification.style.zIndex = '3000';
+            notification.style.textAlign = 'center';
+            notification.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)';
+            notification.textContent = '數字測試模式已啟動！\n檢視所有數字樣式';
+            
+            document.body.appendChild(notification);
+            
+            // 2秒後淡出並移除通知
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.5s';
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            }, 2000);
         }
 
         function renderBoard() {
@@ -941,6 +1175,9 @@
         }
 
         function move(direction, fromAI = false) {
+            // 如果在測試模式下，禁止移動
+            if (testModeEnabled) return false;
+            
             if (isGameOver || document.getElementById("settings-screen").style.display === "flex") return;
 
             const currentBoardState = JSON.parse(JSON.stringify(board));
@@ -1028,6 +1265,8 @@
         }
 
         function setTwo() {
+            if (testModeEnabled) return;
+            
             if (!hasEmptyTile()) return;
             let found = false;
             while (!found) {
@@ -1047,6 +1286,8 @@
         }
 
         function checkWin() {
+            if (testModeEnabled) return;
+            
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
                     if (board[r][c] === 2048) {
@@ -1084,6 +1325,8 @@
         }
 
         function checkGameOver() {
+            if (testModeEnabled) return;
+            
             if (hasEmptyTile()) return;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
@@ -1096,7 +1339,7 @@
 
         // --- 輸入監聽 ---
         document.addEventListener('keyup', (e) => {
-            if (aiEnabled) return;
+            if (aiEnabled || testModeEnabled) return;
             if (e.code == "ArrowLeft") move('Left');
             else if (e.code == "ArrowRight") move('Right');
             else if (e.code == "ArrowUp") move('Up');
@@ -1105,7 +1348,7 @@
 
         let startX, startY;
         document.addEventListener('touchstart', (e) => {
-            if (aiEnabled) return;
+            if (aiEnabled || testModeEnabled) return;
             if(e.touches.length > 1) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -1113,7 +1356,7 @@
         }, { passive: false });
         document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
         document.addEventListener('touchend', (e) => {
-            if (aiEnabled) return;
+            if (aiEnabled || testModeEnabled) return;
             if(!startX || !startY) return;
             let endX = e.changedTouches[0].clientX;
             let endY = e.changedTouches[0].clientY;
@@ -1131,6 +1374,8 @@
 
         // --- 改進的AI託管功能 ---
         function toggleAI() {
+            if (testModeEnabled) return;
+            
             if (aiEnabled) {
                 stopAI();
             } else {
@@ -1141,6 +1386,7 @@
         function startAI() {
             aiEnabled = true;
             document.getElementById('ai-stats-container').classList.add('visible');
+            document.getElementById('ai-direction-display').classList.add('visible');
             document.getElementById('ai-speed').innerText = "慢";
             aiInterval = setInterval(makeAIMove, aiSpeedMap[aiSpeed]);
         }
@@ -1148,14 +1394,69 @@
         function stopAI() {
             aiEnabled = false;
             document.getElementById('ai-stats-container').classList.remove('visible');
+            document.getElementById('ai-direction-display').classList.remove('visible');
+            
+            if (directionDisplayTimer) {
+                clearTimeout(directionDisplayTimer);
+                directionDisplayTimer = null;
+            }
+            
             if (aiInterval) {
                 clearInterval(aiInterval);
                 aiInterval = null;
             }
         }
         
+        // 顯示AI移動方向
+        function showAIDirection(direction) {
+            const arrowElement = document.getElementById('direction-arrow');
+            const textElement = document.getElementById('direction-text');
+            
+            let arrow = '';
+            let text = '';
+            
+            switch(direction) {
+                case 'Left':
+                    arrow = '←';
+                    text = '向左移動';
+                    break;
+                case 'Right':
+                    arrow = '→';
+                    text = '向右移動';
+                    break;
+                case 'Up':
+                    arrow = '↑';
+                    text = '向上移動';
+                    break;
+                case 'Down':
+                    arrow = '↓';
+                    text = '向下移動';
+                    break;
+                default:
+                    arrow = '→';
+                    text = '向右移動';
+            }
+            
+            arrowElement.textContent = arrow;
+            textElement.textContent = text;
+            
+            // 為箭頭添加動畫效果
+            arrowElement.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                arrowElement.style.transform = 'scale(1)';
+            }, 150);
+            
+            // 清除之前的計時器
+            if (directionDisplayTimer) {
+                clearTimeout(directionDisplayTimer);
+            }
+            
+            // 方向顯示會在下次移動時更新，所以不需要定時清除
+            lastAIMove = direction;
+        }
+        
         function makeAIMove() {
-            if (isGameOver) {
+            if (isGameOver || testModeEnabled) {
                 stopAI();
                 return;
             }
@@ -1163,6 +1464,9 @@
             const bestMove = findBestMove();
             
             if (bestMove) {
+                // 顯示移動方向
+                showAIDirection(bestMove);
+                
                 const moved = move(bestMove, true);
                 if (moved) {
                     aiMoves++;
@@ -1170,6 +1474,8 @@
                     playSound('ai');
                 }
             } else {
+                // 沒有有效移動，顯示"無移動"
+                showAIDirection('None');
                 stopAI();
             }
         }
