@@ -79,7 +79,7 @@
         }
         
         .direction-arrow {
-            font-size: 17px; /* 縮小30% (原本24px * 0.7 ≈ 17px) */
+            font-size: 17px;
             font-weight: bold;
             padding: 2px 6px;
             color: #8f7a66;
@@ -93,7 +93,7 @@
         }
         
         .direction-text {
-            font-size: 10px; /* 縮小30% (原本12px * 0.7 ≈ 8.4px，取10px) */
+            font-size: 10px;
             color: #8f7a66;
             margin-top: 2px;
             font-weight: bold;
@@ -212,8 +212,8 @@
 
         /* 8x8棋盤格線調整 - 按比例變細 */
         .size-8 #board {
-            padding: 5px;  /* 原本是10px，現在減半 */
-            gap: 5px;      /* 原本是10px，現在減半 */
+            padding: 5px;
+            gap: 5px;
         }
 
         .tile {
@@ -311,12 +311,17 @@
             color: #f9f6f2;
             box-shadow: 0 0 30px 10px rgba(237, 194, 46, 0.6);
         }
+        .x4096 { 
+            background: linear-gradient(135deg, #3dc2ed 0%, #2da2dd 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 30px 10px rgba(61, 194, 237, 0.6);
+        }
 
         /* 高位數微調 */
         .size-4 .tile.x128, .size-4 .tile.x256, .size-4 .tile.x512 { font-size: 40px; }
-        .size-4 .tile.x1024, .size-4 .tile.x2048 { font-size: 30px; }
+        .size-4 .tile.x1024, .size-4 .tile.x2048, .size-4 .tile.x4096 { font-size: 30px; }
         .size-8 .tile.x128, .size-8 .tile.x256, .size-8 .tile.x512 { font-size: 18px; }
-        .size-8 .tile.x1024, .size-8 .tile.x2048 { font-size: 14px; }
+        .size-8 .tile.x1024, .size-8 .tile.x2048, .size-8 .tile.x4096 { font-size: 14px; }
 
         /* --- Overlay 通用樣式 --- */
         .overlay {
@@ -393,6 +398,48 @@
         }
 
         .size-option.active {
+            background-color: #f2b179;
+            color: #f9f6f2;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(242, 177, 121, 0.5);
+        }
+
+        /* 目標數字選擇器樣式 */
+        .target-selector {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: nowrap;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .target-option {
+            background-color: #eee4da;
+            color: #776e65;
+            border: none;
+            border-radius: 3px;
+            width: 55px;
+            height: 55px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .target-option:hover {
+            background-color: #ede0c8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .target-option.active {
             background-color: #f2b179;
             color: #f9f6f2;
             transform: scale(1.05);
@@ -510,8 +557,8 @@
             
             /* 手機版中針對8x8的調整 */
             .size-8 #board {
-                padding: 2.5px;  /* 手機版更細 */
-                gap: 2.5px;      /* 手機版更細 */
+                padding: 2.5px;
+                gap: 2.5px;
             }
             
             h1 { 
@@ -520,13 +567,13 @@
             
             /* 手機版AI方向顯示調整 - 再縮小30% */
             .direction-arrow {
-                font-size: 14px; /* 手機版縮小30% (原本20px * 0.7 = 14px) */
+                font-size: 14px;
                 padding: 1px 4px;
                 min-width: 25px;
             }
             
             .direction-text {
-                font-size: 8px; /* 手機版縮小30% (原本11px * 0.7 ≈ 8px) */
+                font-size: 8px;
             }
             
             .neon-text { 
@@ -552,7 +599,8 @@
             }
             
             .size-4 .tile.x1024, 
-            .size-4 .tile.x2048 { 
+            .size-4 .tile.x2048,
+            .size-4 .tile.x4096 { 
                 font-size: 24px;
             }
             
@@ -568,7 +616,7 @@
                 display: none; 
             }
             
-            .size-option {
+            .size-option, .target-option {
                 width: 50px;
                 height: 50px;
                 font-size: 14px;
@@ -591,7 +639,7 @@
             /* 手機版按鈕佈局調整 - 新遊戲和撤銷分別靠兩邊 */
             .buttons-row {
                 display: flex;
-                justify-content: space-between; /* 確保按鈕分佈在兩端 */
+                justify-content: space-between;
                 align-items: center;
                 width: 100%;
                 gap: 5px;
@@ -689,6 +737,15 @@
                     </div>
                 </div>
                 <div class="settings-item">
+                    <span>目標數字</span>
+                    <div class="target-selector" id="target-selector">
+                        <button class="target-option" data-target="512">512</button>
+                        <button class="target-option" data-target="1024">1024</button>
+                        <button class="target-option active" data-target="2048">2048</button>
+                        <button class="target-option" data-target="4096">4096</button>
+                    </div>
+                </div>
+                <div class="settings-item">
                     <span>音效</span>
                     <button class="btn" id="sound-btn" onclick="toggleSound()" style="padding:5px 15px; font-size:14px;">開啟</button>
                 </div>
@@ -725,6 +782,10 @@
                     <span class="stat-label">撤銷次數</span>
                     <span class="stat-val" id="vic-undos">0</span>
                 </div>
+                <div class="stat-item">
+                    <span class="stat-label">目標達成</span>
+                    <span class="stat-val" id="vic-target">2048</span>
+                </div>
             </div>
 
             <button class="btn btn-victory-back" onclick="resumeGame()">返回遊戲</button>
@@ -745,6 +806,8 @@
         let soundEnabled = true;
         let gameHistory = []; 
         let selectedGridSize = 4;
+        let targetNumber = 2048;
+        let hasWon = false; // 標記是否已經勝利
         
         // --- AI相關變數 ---
         let aiEnabled = false;
@@ -898,6 +961,8 @@
             window.addEventListener('resize', resizeCanvas);
             
             initSizeSelector();
+            initTargetSelector();
+            updateTitle();
             
             document.getElementById('title-2048').addEventListener('click', function() {
                 titleClickCount++;
@@ -914,6 +979,7 @@
             });
         }
 
+        // 初始化棋盤大小選擇器
         function initSizeSelector() {
             const sizeOptions = document.querySelectorAll('.size-option');
             sizeOptions.forEach(option => {
@@ -928,6 +994,33 @@
                     initGame();
                 });
             });
+        }
+
+        // 初始化目標數字選擇器
+        function initTargetSelector() {
+            const targetOptions = document.querySelectorAll('.target-option');
+            targetOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const target = parseInt(this.getAttribute('data-target'));
+                    
+                    targetOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    targetNumber = target;
+                    
+                    // 更新標題
+                    updateTitle();
+                    
+                    // 重新開始遊戲
+                    initGame();
+                });
+            });
+        }
+
+        // 更新標題函數
+        function updateTitle() {
+            const titleElement = document.getElementById('title-2048');
+            titleElement.textContent = targetNumber;
         }
 
         // 生成權重矩陣
@@ -947,6 +1040,9 @@
 
         function initGame() {
             closeSettings();
+            
+            // 重置勝利狀態
+            hasWon = false;
             
             if (aiEnabled) {
                 stopAI();
@@ -989,6 +1085,9 @@
         }
 
         function undo() {
+            // 如果已經勝利，禁止撤銷
+            if (hasWon) return;
+            
             if (gameHistory.length === 0) return;
             const lastState = gameHistory.pop();
             board = lastState.board;
@@ -1158,8 +1257,13 @@
                     let num = board[r][c];
                     if (num > 0) {
                         tile.innerText = num;
-                        if (num <= 2048) tile.classList.add("x" + num);
-                        else tile.classList.add("x2048");
+                        if (num <= 4096) {
+                            tile.classList.add("x" + num);
+                        } else if (num <= 8192) {
+                            tile.classList.add("x4096");
+                        } else {
+                            tile.classList.add("x2048");
+                        }
                     }
                     boardEl.appendChild(tile);
                 }
@@ -1187,8 +1291,8 @@
         }
 
         function move(direction, fromAI = false) {
-            // 如果在測試模式下，禁止移動
-            if (testModeEnabled) return false;
+            // 如果在測試模式下或已經勝利，禁止移動
+            if (testModeEnabled || hasWon) return false;
             
             if (isGameOver || document.getElementById("settings-screen").style.display === "flex") return;
 
@@ -1264,8 +1368,13 @@
                         if (num > 0) {
                             tile.innerText = num;
                             tile.className = "tile";
-                            if (num <= 2048) tile.classList.add("x" + num);
-                            else tile.classList.add("x2048");
+                            if (num <= 4096) {
+                                tile.classList.add("x" + num);
+                            } else if (num <= 8192) {
+                                tile.classList.add("x4096");
+                            } else {
+                                tile.classList.add("x2048");
+                            }
                         } else {
                             tile.innerText = "";
                             tile.className = "tile";
@@ -1298,11 +1407,11 @@
         }
 
         function checkWin() {
-            if (testModeEnabled) return;
+            if (testModeEnabled || hasWon) return;
             
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
-                    if (board[r][c] === 2048) {
+                    if (board[r][c] === targetNumber) {
                         triggerVictory();
                         return;
                     }
@@ -1311,6 +1420,9 @@
         }
 
         function triggerVictory() {
+            // 設置勝利標記
+            hasWon = true;
+            
             // 保存勝利前的遊戲狀態
             window.victoryBoardState = JSON.parse(JSON.stringify(board));
             window.victoryScore = score;
@@ -1322,6 +1434,7 @@
             document.getElementById("vic-score").innerText = score;
             document.getElementById("vic-steps").innerText = steps;
             document.getElementById("vic-undos").innerText = undoCount;
+            document.getElementById("vic-target").innerText = targetNumber;
 
             document.getElementById("victory-screen").style.display = "flex";
             playSound('win');
@@ -1339,13 +1452,48 @@
             // 停止煙火
             stopFireworks();
             
-            // 恢復遊戲狀態為未結束，允許繼續遊戲
-            isGameOver = false;
+            // 注意：這裡不重置hasWon，保持勝利狀態，禁止繼續遊戲
             
             // 如果AI之前是開啟的，重新開啟AI
             if (aiEnabled) {
                 startAI();
             }
+            
+            // 顯示提示信息
+            showResumeNotification();
+        }
+        
+        // 顯示返回遊戲提示
+        function showResumeNotification() {
+            // 創建提示元素
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = 'rgba(143, 122, 102, 0.9)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.fontSize = '14px';
+            notification.style.fontWeight = 'bold';
+            notification.style.zIndex = '3000';
+            notification.style.textAlign = 'center';
+            notification.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            notification.textContent = '已達到目標 ' + targetNumber + '！請點擊「新遊戲」開始新一局';
+            
+            document.body.appendChild(notification);
+            
+            // 3秒後淡出並移除通知
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.5s';
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            }, 3000);
         }
         
         function triggerDefeat() {
@@ -1373,7 +1521,7 @@
 
         // --- 輸入監聽 ---
         document.addEventListener('keyup', (e) => {
-            if (aiEnabled || testModeEnabled) return;
+            if (aiEnabled || testModeEnabled || hasWon) return;
             if (e.code == "ArrowLeft") move('Left');
             else if (e.code == "ArrowRight") move('Right');
             else if (e.code == "ArrowUp") move('Up');
@@ -1382,7 +1530,7 @@
 
         let startX, startY;
         document.addEventListener('touchstart', (e) => {
-            if (aiEnabled || testModeEnabled) return;
+            if (aiEnabled || testModeEnabled || hasWon) return;
             if(e.touches.length > 1) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -1390,7 +1538,7 @@
         }, { passive: false });
         document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
         document.addEventListener('touchend', (e) => {
-            if (aiEnabled || testModeEnabled) return;
+            if (aiEnabled || testModeEnabled || hasWon) return;
             if(!startX || !startY) return;
             let endX = e.changedTouches[0].clientX;
             let endY = e.changedTouches[0].clientY;
@@ -1408,7 +1556,7 @@
 
         // --- 改進的AI託管功能 ---
         function toggleAI() {
-            if (testModeEnabled) return;
+            if (testModeEnabled || hasWon) return;
             
             if (aiEnabled) {
                 stopAI();
@@ -1418,6 +1566,8 @@
         }
         
         function startAI() {
+            if (hasWon) return;
+            
             aiEnabled = true;
             document.getElementById('ai-stats-container').classList.add('visible');
             document.getElementById('ai-direction-display').classList.add('visible');
@@ -1490,7 +1640,7 @@
         }
         
         function makeAIMove() {
-            if (isGameOver || testModeEnabled) {
+            if (isGameOver || testModeEnabled || hasWon) {
                 stopAI();
                 return;
             }
