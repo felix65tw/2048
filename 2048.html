@@ -7,7 +7,7 @@
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 377px; /* 從 388px 改為 377px */
+            --board-size-mobile: 377px;
             --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
@@ -55,7 +55,7 @@
             margin: 0;
             line-height: 1;
             color: #776e65;
-            cursor: pointer; /* 讓標題可點擊 */
+            cursor: pointer;
             user-select: none;
             transition: transform 0.1s;
         }
@@ -127,12 +127,12 @@
             font-size: 12px;
             color: #8f7a66;
             font-weight: bold;
-            opacity: 0; /* 預設隱藏 */
+            opacity: 0;
             transition: opacity 0.3s;
         }
         
         .ai-stats-container.visible {
-            opacity: 1; /* 顯示時 */
+            opacity: 1;
         }
         
         .ai-stat-item {
@@ -227,7 +227,7 @@
             flex-direction: column;
             gap: 20px;
             width: 90%;
-            max-width: 400px; /* 增加最大寬度以容納5個按鈕 */
+            max-width: 400px;
         }
 
         .settings-item {
@@ -244,9 +244,9 @@
             display: flex;
             gap: 8px;
             justify-content: center;
-            flex-wrap: nowrap; /* 確保不換行 */
+            flex-wrap: nowrap;
             width: 100%;
-            overflow-x: auto; /* 如果寬度不夠，可以橫向滾動 */
+            overflow-x: auto;
             padding-bottom: 5px;
         }
 
@@ -255,7 +255,7 @@
             color: #776e65;
             border: none;
             border-radius: 3px;
-            width: 55px; /* 稍微減小寬度以容納5個按鈕 */
+            width: 55px;
             height: 55px;
             font-size: 16px;
             font-weight: bold;
@@ -265,7 +265,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            flex-shrink: 0; /* 防止按鈕被壓縮 */
+            flex-shrink: 0;
         }
 
         .size-option:hover {
@@ -328,27 +328,27 @@
         /* 勝利統計數據 - 修改為三行顯示 */
         .victory-stats {
             display: flex;
-            flex-direction: column; /* 垂直排列 */
+            flex-direction: column;
             gap: 15px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px 40px;     /* 增加內距讓框框看起來穩重 */
+            padding: 20px 40px;
             border-radius: 10px;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
             text-align: center;
-            min-width: 180px;       /* 設定最小寬度 */
+            min-width: 180px;
         }
 
         .stat-item { 
             display: flex; 
             flex-direction: column;
-            border-bottom: 1px solid rgba(255,255,255,0.2); /* 每一行加底線 */
+            border-bottom: 1px solid rgba(255,255,255,0.2);
             padding-bottom: 10px;
         }
         
         .stat-item:last-child {
-            border-bottom: none; /* 最後一行不要底線 */
+            border-bottom: none;
             padding-bottom: 0;
         }
 
@@ -368,21 +368,20 @@
 
         /* --- 手機版 RWD --- */
         @media screen and (max-width: 520px) {
-            /* 調整為377px */
             :root { 
-                --board-size-mobile: 377px; /* 從 388px 改為 377px */
+                --board-size-mobile: 377px;
                 --grid-gap: 5px; 
             }
             
-            /* 將整體遊戲區域向上移動四分之一高度 */
+            /* 將整體遊戲區域再往上移動四分之一 - 減少頂部空間 */
             body {
                 justify-content: flex-start;
-                padding-top: 10vh; /* 減少頂部空間，使整體向上移動 */
+                padding-top: 3vh; /* 從5vh改為3vh，再往上移動 */
             }
             
             .controls-container { 
                 width: var(--board-size-mobile); 
-                margin-top: 2vh; /* 微調控制列的頂部間距 */
+                margin-top: 1vh; /* 進一步減少頂部間距 */
             }
             
             #board {
@@ -390,11 +389,11 @@
                 height: var(--board-size-mobile);
                 padding: 5px; 
                 gap: 5px;
-                margin-top: 1vh; /* 微調棋盤的頂部間距 */
+                margin-top: 0.5vh; /* 進一步減少頂部間距 */
             }
             
             h1 { 
-                font-size: 36px; /* 適度調整標題大小 */
+                font-size: 36px;
             }
             
             .neon-text { 
@@ -403,27 +402,27 @@
             
             /* 棋盤內文字放大 */
             .size-4 .tile { 
-                font-size: 36px; /* 從40px調整為36px */
+                font-size: 36px;
             }
             
             .size-6 .tile { 
-                font-size: 22px; /* 從25px調整為22px */
+                font-size: 22px;
             }
             
             .size-8 .tile { 
-                font-size: 16px; /* 從18px調整為16px */
+                font-size: 16px;
             }
             
             /* 高位數微調 - 手機版也相應調整 */
             .size-4 .tile.x128, 
             .size-4 .tile.x256, 
             .size-4 .tile.x512 { 
-                font-size: 32px; /* 從35px調整為32px */
+                font-size: 32px;
             }
             
             .size-4 .tile.x1024, 
             .size-4 .tile.x2048 { 
-                font-size: 24px; /* 從28px調整為24px */
+                font-size: 24px;
             }
             
             .victory-stats { 
@@ -441,9 +440,9 @@
             
             /* 手機版調整棋盤大小選擇器 */
             .size-option {
-                width: 50px; /* 從52px調整為50px */
-                height: 50px; /* 從52px調整為50px */
-                font-size: 14px; /* 從15px調整為14px */
+                width: 50px;
+                height: 50px;
+                font-size: 14px;
             }
             
             /* 設定內容寬度調整 */
@@ -459,7 +458,7 @@
             }
             
             .score-val {
-                font-size: 18px; /* 從20px調整為18px */
+                font-size: 18px;
             }
             
             /* 手機版按鈕調整 */
@@ -591,19 +590,19 @@
         let board;
         let score = 0;
         let steps = 0;
-        let undoCount = 0; // 紀錄撤銷次數
+        let undoCount = 0;
         let rows = 4;
         let columns = 4;
         let isGameOver = false;
         let soundEnabled = true;
         let gameHistory = []; 
-        let selectedGridSize = 4; // 預設選擇 4x4
+        let selectedGridSize = 4;
         
         // --- AI相關變數 ---
         let aiEnabled = false;
         let aiInterval = null;
         let aiMoves = 0;
-        let aiSpeed = "slow"; // 固定為慢速500ms/步
+        let aiSpeed = "slow";
         const aiSpeedMap = {
             "slow": 500,
             "medium": 200,
@@ -656,7 +655,6 @@
                 gainNode.gain.linearRampToValueAtTime(0.01, now + 0.8);
                 osc.start(now); osc.stop(now + 0.8);
             } else if (type === 'win') {
-                // 勝利音效
                 const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98]; 
                 notes.forEach((freq, i) => {
                     setTimeout(() => {
@@ -684,7 +682,6 @@
                 noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 noise.start(audioCtx.currentTime);
             } else if (type === 'ai') {
-                // AI音效 - 更輕柔
                 osc.type = 'sine'; osc.frequency.setValueAtTime(400, now);
                 osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
                 gainNode.gain.setValueAtTime(0.05, now);
@@ -702,7 +699,6 @@
 
         // --- 設定選單邏輯 ---
         function openSettings() {
-            // 如果遊戲結束或勝利畫面正在顯示，暫時不給開設定，避免層級混亂
             if(document.getElementById("victory-screen").style.display === "flex") return;
             document.getElementById("settings-screen").style.display = "flex";
         }
@@ -712,7 +708,6 @@
         }
 
         // --- 測試密技 ---
-        // 1. 點 Score 3次 -> 贏
         let winClickCount = 0;
         let winClickTimer = null;
         document.getElementById("score-box-trigger").addEventListener("click", function() {
@@ -725,7 +720,6 @@
             winClickTimer = setTimeout(() => { winClickCount = 0; }, 500); 
         });
 
-        // 2. 點 Steps 3次 -> 輸
         let loseClickCount = 0;
         let loseClickTimer = null;
         document.getElementById("step-box-trigger").addEventListener("click", function() {
@@ -743,20 +737,16 @@
             initGame();
             window.addEventListener('resize', resizeCanvas);
             
-            // 初始化棋盤大小選擇器
             initSizeSelector();
             
-            // 初始化標題點擊事件
             document.getElementById('title-2048').addEventListener('click', function() {
                 titleClickCount++;
                 
-                // 重置計時器
                 clearTimeout(titleClickTimer);
                 titleClickTimer = setTimeout(() => { 
                     titleClickCount = 0; 
-                }, 1000); // 1秒內點擊有效
+                }, 1000);
                 
-                // 點擊6次觸發AI託管
                 if (titleClickCount === 6) {
                     toggleAI();
                     titleClickCount = 0;
@@ -764,35 +754,29 @@
             });
         }
 
-        // 初始化棋盤大小選擇器
         function initSizeSelector() {
             const sizeOptions = document.querySelectorAll('.size-option');
             sizeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     const size = parseInt(this.getAttribute('data-size'));
                     
-                    // 更新選中狀態
                     sizeOptions.forEach(opt => opt.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // 更新選擇的棋盤大小
                     selectedGridSize = size;
                     
-                    // 重新開始遊戲
                     initGame();
                 });
             });
         }
 
         function initGame() {
-            closeSettings(); // 確保設定關閉
+            closeSettings();
             
-            // 停止AI
             if (aiEnabled) {
                 stopAI();
             }
             
-            // 使用選擇的棋盤大小
             const size = selectedGridSize;
             rows = size;
             columns = size;
@@ -830,17 +814,15 @@
             score = lastState.score;
             steps = lastState.steps;
             
-            // 撤銷時增加計數
             undoCount++; 
             isGameOver = false;
             
-            // 隱藏失敗畫面
             document.getElementById("game-over").style.display = "none";
             
             document.getElementById("score").innerText = score;
             document.getElementById("steps").innerText = steps;
             
-            renderBoard();
+            updateBoardWithoutRerender();
             updateUndoButton();
             playSound('undo');
         }
@@ -938,12 +920,8 @@
                 document.getElementById("score").innerText = score;
                 document.getElementById("steps").innerText = steps;
                 
-                // AI移動時不重畫棋盤，只更新數字
-                if (fromAI) {
-                    updateBoardWithoutRerender();
-                } else {
-                    renderBoard();
-                }
+                // 更新棋盤而不重畫所有格子
+                updateBoardWithoutRerender();
                 
                 setTwo();
                 
@@ -969,9 +947,7 @@
                         const tile = tiles[tileIndex];
                         if (num > 0) {
                             tile.innerText = num;
-                            // 移除所有數字類別
                             tile.className = "tile";
-                            // 添加對應的數字類別
                             if (num <= 2048) tile.classList.add("x" + num);
                             else tile.classList.add("x2048");
                         } else {
@@ -992,12 +968,8 @@
                 let c = Math.floor(Math.random() * columns);
                 if (board[r][c] == 0) {
                     board[r][c] = Math.random() > 0.1 ? 2 : 4;
-                    // AI移動時不重畫棋盤
-                    if (!aiEnabled) {
-                        renderBoard();
-                    } else {
-                        updateBoardWithoutRerender();
-                    }
+                    // 更新棋盤而不重畫所有格子
+                    updateBoardWithoutRerender();
                     found = true;
                 }
             }
@@ -1022,7 +994,6 @@
         function triggerVictory() {
             isGameOver = true;
             
-            // 更新勝利畫面的數據
             document.getElementById("vic-score").innerText = score;
             document.getElementById("vic-steps").innerText = steps;
             document.getElementById("vic-undos").innerText = undoCount;
@@ -1031,7 +1002,6 @@
             playSound('win');
             startFireworks();
             
-            // 停止AI
             if (aiEnabled) {
                 stopAI();
             }
@@ -1042,7 +1012,6 @@
             document.getElementById("game-over").style.display = "flex";
             playSound('gameover');
             
-            // 停止AI
             if (aiEnabled) {
                 stopAI();
             }
@@ -1061,7 +1030,7 @@
 
         // --- 輸入監聽 ---
         document.addEventListener('keyup', (e) => {
-            if (aiEnabled) return; // AI託管時禁用鍵盤控制
+            if (aiEnabled) return;
             if (e.code == "ArrowLeft") move('Left');
             else if (e.code == "ArrowRight") move('Right');
             else if (e.code == "ArrowUp") move('Up');
@@ -1070,7 +1039,7 @@
 
         let startX, startY;
         document.addEventListener('touchstart', (e) => {
-            if (aiEnabled) return; // AI託管時禁用手勢控制
+            if (aiEnabled) return;
             if(e.touches.length > 1) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -1078,7 +1047,7 @@
         }, { passive: false });
         document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
         document.addEventListener('touchend', (e) => {
-            if (aiEnabled) return; // AI託管時禁用手勢控制
+            if (aiEnabled) return;
             if(!startX || !startY) return;
             let endX = e.changedTouches[0].clientX;
             let endY = e.changedTouches[0].clientY;
@@ -1106,20 +1075,16 @@
         function startAI() {
             aiEnabled = true;
             
-            // 顯示AI統計信息
             document.getElementById('ai-stats-container').classList.add('visible');
             
-            // 更新AI速度顯示
             document.getElementById('ai-speed').innerText = "慢";
             
-            // 開始AI循環
             aiInterval = setInterval(makeAIMove, aiSpeedMap[aiSpeed]);
         }
         
         function stopAI() {
             aiEnabled = false;
             
-            // 隱藏AI統計信息
             document.getElementById('ai-stats-container').classList.remove('visible');
             
             if (aiInterval) {
@@ -1134,18 +1099,16 @@
                 return;
             }
             
-            // AI演算法：基於啟發式評估選擇最佳移動
             const bestMove = findBestMove();
             
             if (bestMove) {
-                const moved = move(bestMove, true); // 傳入true表示來自AI
+                const moved = move(bestMove, true);
                 if (moved) {
                     aiMoves++;
                     document.getElementById('ai-moves').innerText = aiMoves;
                     playSound('ai');
                 }
             } else {
-                // 如果沒有有效移動，停止AI
                 stopAI();
             }
         }
@@ -1155,18 +1118,14 @@
             let bestScore = -Infinity;
             let bestMove = null;
             
-            // 遍歷所有可能的方向
             for (const dir of directions) {
-                // 創建棋盤副本進行模擬
                 const testBoard = JSON.parse(JSON.stringify(board));
                 const { board: newBoard, moved, score: moveScore } = simulateMove(testBoard, dir);
                 
                 if (!moved) continue;
                 
-                // 計算這個移動的得分
                 const moveEval = evaluateBoard(newBoard);
                 
-                // 加上移動本身的分數
                 const totalScore = moveEval + moveScore * 0.1;
                 
                 if (totalScore > bestScore) {
@@ -1190,10 +1149,8 @@
                     
                     if (direction === 'Right') row.reverse();
                     
-                    // 過濾零值
                     let filtered = row.filter(num => num !== 0);
                     
-                    // 合併相鄰相同數字
                     for (let i = 0; i < filtered.length - 1; i++) {
                         if (filtered[i] === filtered[i + 1]) {
                             filtered[i] *= 2;
@@ -1202,7 +1159,6 @@
                         }
                     }
                     
-                    // 補齊零值
                     while (filtered.length < columns) filtered.push(0);
                     
                     if (direction === 'Right') filtered.reverse();
@@ -1220,10 +1176,8 @@
                     
                     if (direction === 'Down') col.reverse();
                     
-                    // 過濾零值
                     let filtered = col.filter(num => num !== 0);
                     
-                    // 合併相鄰相同數字
                     for (let i = 0; i < filtered.length - 1; i++) {
                         if (filtered[i] === filtered[i + 1]) {
                             filtered[i] *= 2;
@@ -1232,12 +1186,10 @@
                         }
                     }
                     
-                    // 補齊零值
                     while (filtered.length < rows) filtered.push(0);
                     
                     if (direction === 'Down') filtered.reverse();
                     
-                    // 放回棋盤
                     for (let r = 0; r < rows; r++) newBoard[r][c] = filtered[r];
                     
                     if (JSON.stringify(col) !== JSON.stringify(filtered)) moved = true;
@@ -1250,7 +1202,6 @@
         function evaluateBoard(board) {
             let score = 0;
             
-            // 1. 空格子數量（越多越好）
             let emptyCells = 0;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
@@ -1259,7 +1210,6 @@
             }
             score += emptyCells * 10;
             
-            // 2. 最大數字在角落（更好）
             let maxTile = 0;
             let maxTilePos = { r: 0, c: 0 };
             for (let r = 0; r < rows; r++) {
@@ -1271,7 +1221,6 @@
                 }
             }
             
-            // 檢查最大數字是否在角落
             const corners = [
                 { r: 0, c: 0 },
                 { r: 0, c: columns - 1 },
@@ -1291,7 +1240,6 @@
                 score += maxTile * 2;
             }
             
-            // 3. 單調性評估（相鄰數字遞減）
             let monotonicityScore = 0;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns - 1; c++) {
@@ -1311,7 +1259,6 @@
             
             score += monotonicityScore * 0.1;
             
-            // 4. 平滑性（避免過大差異）
             let smoothnessScore = 0;
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns - 1; c++) {
