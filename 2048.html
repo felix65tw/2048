@@ -7,7 +7,7 @@
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 352px; /* 從 320px 改為 352px (放大10%) */
+            --board-size-mobile: 380px; /* 從 320px 改為 352px (放大10%) */
             --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
@@ -210,14 +210,43 @@
             font-weight: bold;
         }
 
-        select {
-            padding: 8px;
-            border-radius: 5px;
-            border: 2px solid #8f7a66;
-            background: #fff;
+        /* 重新設計棋盤大小選擇器 - 符合2048風格 */
+        .size-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .size-option {
+            background-color: #eee4da;
             color: #776e65;
+            border: none;
+            border-radius: 3px;
+            width: 60px;
+            height: 60px;
+            font-size: 18px;
             font-weight: bold;
-            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .size-option:hover {
+            background-color: #ede0c8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .size-option.active {
+            background-color: #f2b179;
+            color: #f9f6f2;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(242, 177, 121, 0.5);
         }
 
         /* --- 遊戲結束畫面 (失敗) --- */
@@ -331,6 +360,13 @@
             
             /* 隱藏提示文字 */
             .instructions { display: none; }
+            
+            /* 手機版調整棋盤大小選擇器 */
+            .size-option {
+                width: 50px;
+                height: 50px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -368,15 +404,15 @@
         <div id="settings-screen" class="overlay">
             <h2 style="font-size:30px; margin-bottom:20px;">設 定</h2>
             <div class="settings-content">
-                <div class="settings-item">
+                <div class="settings-item" style="flex-direction: column; align-items: center; gap: 10px;">
                     <span>棋盤大小</span>
-                    <select id="grid-size" onchange="initGame()">
-                        <option value="3">3 x 3</option>
-                        <option value="4" selected>4 x 4</option>
-                        <option value="5">5 x 5</option>
-                        <option value="6">6 x 6</option>
-                        <option value="8">8 x 8</option>
-                    </select>
+                    <div class="size-selector" id="size-selector">
+                        <button class="size-option" data-size="3">3×3</button>
+                        <button class="size-option active" data-size="4">4×4</button>
+                        <button class="size-option" data-size="5">5×5</button>
+                        <button class="size-option" data-size="6">6×6</button>
+                        <button class="size-option" data-size="8">8×8</button>
+                    </div>
                 </div>
                 <div class="settings-item">
                     <span>音效</span>
@@ -439,6 +475,7 @@
         let isGameOver = false;
         let soundEnabled = true;
         let gameHistory = []; 
+        let selectedGridSize = 4; // 預設選擇 4x4
 
         // --- 音效系統 (Web Audio API) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -560,13 +597,36 @@
         window.onload = function() {
             initGame();
             window.addEventListener('resize', resizeCanvas);
+            
+            // 初始化棋盤大小選擇器
+            initSizeSelector();
+        }
+
+        // 初始化棋盤大小選擇器
+        function initSizeSelector() {
+            const sizeOptions = document.querySelectorAll('.size-option');
+            sizeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const size = parseInt(this.getAttribute('data-size'));
+                    
+                    // 更新選中狀態
+                    sizeOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新選擇的棋盤大小
+                    selectedGridSize = size;
+                    
+                    // 重新開始遊戲
+                    initGame();
+                });
+            });
         }
 
         function initGame() {
             closeSettings(); // 確保設定關閉
             
-            const sizeSelect = document.getElementById("grid-size");
-            const size = parseInt(sizeSelect.value);
+            // 使用選擇的棋盤大小
+            const size = selectedGridSize;
             rows = size;
             columns = size;
 
