@@ -475,6 +475,7 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
+            height: 100%;
         }
 
         .neon-text {
@@ -678,6 +679,25 @@
             .btn-victory-back {
                 font-size: 18px;
                 padding: 12px 30px;
+            }
+            
+            /* 手機版勝利畫面上移三分之一 */
+            #victory-screen .victory-content {
+                justify-content: flex-start;
+                padding-top: 20vh; /* 使用視窗高度的20%作為上邊距，讓內容整體上移 */
+                transform: translateY(-10%); /* 再上移10%以達到整體上移三分之一的效果 */
+            }
+            
+            /* 調整勝利畫面的統計數據容器，使其在手機上更緊湊 */
+            .victory-stats {
+                padding: 15px 20px;
+                gap: 10px;
+            }
+            
+            /* 調整勝利畫面的按鈕大小 */
+            .btn-victory-back {
+                font-size: 16px;
+                padding: 10px 25px;
             }
         }
     </style>
