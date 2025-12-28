@@ -7,7 +7,7 @@
     <style>
         :root {
             --board-size-desktop: 500px;
-            --board-size-mobile: 320px;
+            --board-size-mobile: 352px; /* 從 320px 改為 352px (放大10%) */
             --grid-gap: 10px;
             --tile-base-color: #cdc1b4;
             --bg-color: #faf8ef;
@@ -264,23 +264,35 @@
             100% { opacity: 0.9; transform: scale(1.05); }
         }
 
-        /* 勝利統計數據 */
+        /* 勝利統計數據 - 修改為三行顯示 */
         .victory-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            display: flex;
+            flex-direction: column; /* 垂直排列 */
             gap: 15px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px 25px;
+            padding: 20px 40px;     /* 增加內距讓框框看起來穩重 */
             border-radius: 10px;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
             text-align: center;
+            min-width: 180px;       /* 設定最小寬度 */
         }
 
-        .stat-item { display: flex; flex-direction: column; }
-        .stat-label { font-size: 12px; color: #ccc; margin-bottom: 5px; }
-        .stat-val { font-size: 24px; font-weight: bold; color: #ffeb3b; }
+        .stat-item { 
+            display: flex; 
+            flex-direction: column;
+            border-bottom: 1px solid rgba(255,255,255,0.2); /* 每一行加底線 */
+            padding-bottom: 10px;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none; /* 最後一行不要底線 */
+            padding-bottom: 0;
+        }
+
+        .stat-label { font-size: 14px; color: #ccc; margin-bottom: 2px; }
+        .stat-val { font-size: 28px; font-weight: bold; color: #ffeb3b; letter-spacing: 1px;}
 
         .btn-victory-new {
             background-color: #f65e3b;
@@ -295,21 +307,30 @@
 
         /* --- 手機版 RWD --- */
         @media screen and (max-width: 520px) {
+            /* 整體放大10% */
+            :root { 
+                --board-size-mobile: 352px; /* 從 320px 改為 352px */
+                --grid-gap: 5px; 
+            }
+            
             .controls-container { width: var(--board-size-mobile); }
             #board {
                 width: var(--board-size-mobile);
                 height: var(--board-size-mobile);
                 padding: 5px; gap: 5px;
             }
-            :root { --grid-gap: 5px; }
+            
             h1 { font-size: 36px; }
             .neon-text { font-size: 50px; }
             .size-4 .tile { font-size: 35px; }
             .size-6 .tile { font-size: 20px; }
             .size-8 .tile { font-size: 14px; }
             
-            .victory-stats { gap: 10px; padding: 10px; }
-            .stat-val { font-size: 20px; }
+            .victory-stats { padding: 15px 30px; }
+            .stat-val { font-size: 24px; }
+            
+            /* 隱藏提示文字 */
+            .instructions { display: none; }
         }
     </style>
 </head>
@@ -384,7 +405,7 @@
         <div class="victory-content">
             <div class="neon-text">YOU WIN!</div>
             
-            <!-- 勝利統計資訊 -->
+            <!-- 勝利統計資訊 (改為三行顯示) -->
             <div class="victory-stats">
                 <div class="stat-item">
                     <span class="stat-label">分數</span>
@@ -395,7 +416,7 @@
                     <span class="stat-val" id="vic-steps">0</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">撤銷</span>
+                    <span class="stat-label">撤銷次數</span>
                     <span class="stat-val" id="vic-undos">0</span>
                 </div>
             </div>
@@ -522,7 +543,7 @@
             winClickTimer = setTimeout(() => { winClickCount = 0; }, 500); 
         });
 
-        // 2. 點 Steps 3次 -> 輸 (新增需求)
+        // 2. 點 Steps 3次 -> 輸
         let loseClickCount = 0;
         let loseClickTimer = null;
         document.getElementById("step-box-trigger").addEventListener("click", function() {
@@ -580,7 +601,7 @@
             score = lastState.score;
             steps = lastState.steps;
             
-            // 撤銷時增加計數 (注意: 這裡的邏輯是只要用了撤銷就算一次，不管退幾步)
+            // 撤銷時增加計數
             undoCount++; 
             isGameOver = false;
             
@@ -721,8 +742,6 @@
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < columns; c++) {
                     if (board[r][c] === 2048) {
-                        // 檢查是否已經顯示過勝利 (暫不重複顯示，直到新遊戲)
-                        // 這裡為了簡化，只要出現 2048 就結束
                         triggerVictory();
                         return;
                     }
